@@ -1065,9 +1065,6 @@ void Sprite::updateTransform(void)
         if (_textureAtlas)
             _textureAtlas->updateQuad(&_quad, _atlasIndex);
 
-        //when camera differs
-        setMVPMatrixUniform();
-
         _recursiveDirty = false;
         setDirty(false);
     }
@@ -1081,7 +1078,7 @@ void Sprite::draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)
     if (_texture == nullptr || _texture->getBackendTexture() == nullptr)
         return;
     
-    //TODO: anrold: current camera can be a customized one.
+    //TODO: anrold: current camera can be a non-default one.
     setMVPMatrixUniform();
 
 #if CC_USE_CULLING

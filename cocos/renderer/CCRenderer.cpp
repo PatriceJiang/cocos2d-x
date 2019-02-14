@@ -773,6 +773,7 @@ void Renderer::popGlobalStates()
     _depthStencilDescriptor = states._depthStencilDescriptor;
     _cullMode = states._cullMode;
     _winding = states._winding;
+    _globalStateStack.pop_back();
 }
 
 backend::RenderPipeline* Renderer::getRenderPipeline(const backend::RenderPipelineDescriptor& descriptor)

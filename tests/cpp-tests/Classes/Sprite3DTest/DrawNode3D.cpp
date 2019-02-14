@@ -68,6 +68,7 @@ bool DrawNode3D::init()
     _programStateLine = new backend::ProgramState(lineColor3D_vert, lineColor3D_frag);
     pd.programState = _programStateLine;
     
+    _locMVPMatrix = _programStateLine->getUniformLocation("u_MVPMatrix");
 
     _beforeCommand.func = CC_CALLBACK_0(DrawNode3D::onBeforeDraw, this);
     _afterCommand.func = CC_CALLBACK_0(DrawNode3D::onAfterDraw, this);
@@ -126,7 +127,10 @@ void DrawNode3D::draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)
 
 void DrawNode3D::updateCommand(cocos2d::Renderer* renderer,const Mat4 &transform, uint32_t flags)
 {
-    _programStateLine->setBuiltinUniforms(transform);
+    auto &matrixP = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+    auto mvp = matrixP * transform;
+
+    _programStateLine->setUniform(_locMVPMatrix, mvp.m);
 
     //TODO arnold: _customcommand should support enable depth !!!
     // glEnable(GL_DEPTH_TEST);
