@@ -32,9 +32,9 @@
 #include "renderer/CCTexture2D.h"
 #include "renderer/CCTechnique.h"
 #include "renderer/CCMaterial.h"
-#include "renderer/CCVertexAttribBinding.h"
 #include "renderer/backend/ProgramState.h"
 #include "3d/CCMeshVertexIndexData.h"
+#include "3d/CCVertexAttribBinding.h"
 #include "base/CCDirector.h"
 #include "renderer/CCRenderer.h"
 

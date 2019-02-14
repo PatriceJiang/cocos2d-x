@@ -27,6 +27,7 @@
 #include "3d/CCMeshSkin.h"
 #include "3d/CCSkeleton3D.h"
 #include "3d/CCMeshVertexIndexData.h"
+#include "3d/CCVertexAttribBinding.h"
 #include "2d/CCLight.h"
 #include "2d/CCScene.h"
 #include "base/CCEventDispatcher.h"
@@ -38,7 +39,6 @@
 #include "renderer/CCPass.h"
 #include "renderer/CCRenderer.h"
 #include "renderer/backend/Buffer.h"
-#include "renderer/CCVertexAttribBinding.h"
 #include "math/Mat4.h"
 
 using namespace std;

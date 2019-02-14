@@ -66,9 +66,9 @@ public:
     TextureCubeMapGL(const TextureDescriptor& descriptor);
     virtual ~TextureCubeMapGL();
     virtual void apply(int index) const override;
-    bool init(const std::string& positive_x, const std::string& negative_x,
-        const std::string& positive_y, const std::string& negative_y,
-        const std::string& positive_z, const std::string& negative_z);
+
+    bool updateImageData(int side, Texture2D::PixelFormat format, int width, int height, unsigned char *data);
+    void setTexParams(const Texture2D::TexParams &);
 };
 
 CC_BACKEND_END
