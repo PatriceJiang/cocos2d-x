@@ -398,10 +398,8 @@ void Mesh::draw(Renderer* renderer, float globalZOrder, const Mat4& transform, u
     auto technique = _material->_currentTechnique;
     for(const auto pass : technique->_passes)
     {
-
         pass->setUniformColor(&color, sizeof(color));
 
-        static_assert(sizeof(Vec4) == (sizeof(float) * 4), "sizeof Vec4 should be 16 bytes");
         if (_skin)
             pass->setUniformMatrixPalette(_skin->getMatrixPalette(), _skin->getMatrixPaletteSizeInBytes());
 

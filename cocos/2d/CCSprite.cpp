@@ -999,7 +999,6 @@ void Sprite::updateTransform(void)
     // recalculate matrix only if it is dirty
     if(isDirty() )
     {
-        setMVPMatrixUniform();
         // If it is not visible, or one of its ancestors is not visible, then do nothing:
         if( !_visible || ( _parent && _parent != _batchNode && static_cast<Sprite*>(_parent)->_shouldBeHidden) )
         {
