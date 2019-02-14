@@ -150,16 +150,16 @@ protected:
 
 private:
     
-    backend::ProgramState* _programState = nullptr;
-
-    void onBeforeVisitCmd();
-    void onAfterVisitCmd();
-
-    CallbackCommand _beforeVisitCmd;
-    CallbackCommand _afterVisitCmd;
 
     //bool _oldDepthEnabledState;
     void initUniformLocations();
+    void onBeforeVisitCmd();
+    void onAfterVisitCmd();
+
+    backend::ProgramState* _programState = nullptr;
+
+    CallbackCommand _beforeVisitCmd;
+    CallbackCommand _afterVisitCmd;
 
     backend::UniformLocation _locMVPMatrix;
     backend::UniformLocation _locMVMatrix;
@@ -186,6 +186,9 @@ private:
     backend::UniformLocation _locSpotLightRangeInverse;
 
     backend::UniformLocation _locAmbientLigthColor;
+
+    bool _rendererDepthTestEnabled;
+    backend::CompareFunction _rendererDepthCmpFunc;
 };
 
 NS_CC_END

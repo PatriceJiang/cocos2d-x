@@ -271,25 +271,19 @@ void Pass::onBeforeVisitCmd()
 
     auto &pipelineDescriptor = _customCommand.getPipelineDescriptor();
 
-    renderer->pushGlobalStates();
-
-    //TODO arnold
+    _rendererDepthTestEnabled = renderer->getDepthTest();
+    _rendererDepthCmpFunc = renderer->getDepthCompareFunction();
+    
     _renderState.bindPass(this);
-
     renderer->setDepthTest(true);
 }
 
 void Pass::onAfterVisitCmd()
 {
     auto *renderer = Director::getInstance()->getRenderer();
-    //TODO arnold : restore renderState
-    //RenderState::StateBlock::restoreGlobalState(0);
-
-    //renderer->setDepthTest(_oldDepthEnabledState);
-
     _renderState.unbindPass(this);
-
-    renderer->popGlobalStates();
+    renderer->setDepthTest(_rendererDepthTestEnabled);
+    renderer->setDepthCompareFunction(_rendererDepthCmpFunc);
 }
 
 
