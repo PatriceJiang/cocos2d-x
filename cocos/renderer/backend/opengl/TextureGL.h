@@ -2,6 +2,7 @@
 
 #include "../Texture.h"
 #include "platform/CCGL.h"
+#include "renderer/CCTexture2D.h"
 
 CC_BACKEND_BEGIN
 
