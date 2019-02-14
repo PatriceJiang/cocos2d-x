@@ -83,7 +83,6 @@ bool Skybox::init()
     initBuffers();
 
     CHECK_GL_ERROR_DEBUG();
-    _globalZOrder = -1; //draw before normal 3d objects
 
     return true;
 }

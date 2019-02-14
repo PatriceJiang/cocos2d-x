@@ -273,6 +273,7 @@ void Pass::onBeforeVisitCmd()
 
     _rendererDepthTestEnabled = renderer->getDepthTest();
     _rendererDepthCmpFunc = renderer->getDepthCompareFunction();
+    _rendererCullMode = renderer->getCullMode();
     
     _renderState.bindPass(this);
     renderer->setDepthTest(true);
@@ -284,6 +285,7 @@ void Pass::onAfterVisitCmd()
     _renderState.unbindPass(this);
     renderer->setDepthTest(_rendererDepthTestEnabled);
     renderer->setDepthCompareFunction(_rendererDepthCmpFunc);
+    renderer->setCullMode(_rendererCullMode);
 }
 
 
