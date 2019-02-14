@@ -60,10 +60,6 @@ TextureCubeGL::TextureCubeGL()
     descriptor.height = 4;
     _texture = new TextureCubeMapGL(descriptor);
 }
-TextureCubeGL::~TextureCubeGL()
-{
-
-}
 
 bool TextureCubeGL::updateImageData(int side, Texture2D::PixelFormat format, int width, int height, unsigned char *data)
 {

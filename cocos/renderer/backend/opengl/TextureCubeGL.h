@@ -32,7 +32,6 @@ class CC_DLL TextureCubeGL : public TextureCube
 {
 public:
     TextureCubeGL();
-    virtual ~TextureCubeGL();
     virtual void setTexParameters(const TexParams&);
     virtual bool updateImageData(int side, Texture2D::PixelFormat format, int width, int height, unsigned char *data) override;
 
