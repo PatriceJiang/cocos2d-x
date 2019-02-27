@@ -553,7 +553,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (skins) {
 		Json *slotMap;
 		skeletonData->skinsCount = skins->size;
-		skeletonData->skins = MALLOC(spSkin*, skins->size);
+		skeletonData->skins = CALLOC(spSkin*, skins->size);
 		for (slotMap = skins->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			Json *attachmentsMap;
 			spSkin *skin = spSkin_create(slotMap->name);

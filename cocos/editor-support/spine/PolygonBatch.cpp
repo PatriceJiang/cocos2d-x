@@ -87,18 +87,19 @@ void PolygonBatch::add (const cocos2d::Mat4 &mat, const Texture2D* addTexture,
 		this->flush(mat);
 		_texture = addTexture;
 	}
-    int triangleCount = _triangles.size();
-    int verticesCount = _vertices.size();
-	for (int i = 0; i < addTrianglesCount; ++i, ++triangleCount)
-		_triangles[triangleCount] = addTriangles[i] + verticesCount;
+    const int triangleCount = _triangles.size();
+    const int verticesCount = _vertices.size();
+	for (int i = 0; i < addTrianglesCount; ++i)
+		_triangles.push_back(addTriangles[i] + verticesCount);
 
-	for (int i = 0; i < addVerticesCount; i += 2, ++verticesCount) {
-		V2F_C4B_T2F* vertex = &_vertices[verticesCount];
-		vertex->vertices.x = addVertices[i];
-		vertex->vertices.y = addVertices[i + 1];
-		vertex->colors = *color;
-		vertex->texCoords.u = uvs[i];
-		vertex->texCoords.v = uvs[i + 1];
+	for (int i = 0; i < addVerticesCount; i += 2) {
+        V2F_C4B_T2F vertex;
+		vertex.vertices.x = addVertices[i];
+		vertex.vertices.y = addVertices[i + 1];
+		vertex.colors = *color;
+		vertex.texCoords.u = uvs[i];
+		vertex.texCoords.v = uvs[i + 1];
+        _vertices.push_back(vertex);
 	}
 }
 
