@@ -43,6 +43,7 @@ class RootTests : public TestList
 public:
     RootTests()
     {
+        addTest("Node: Spine", [](){return new SpineTests(); });
 //        addTest("Node: Scene3D", [](){return new (std::nothrow) Scene3DTests(); });
         addTest("ActionManager", [](){return new (std::nothrow) ActionManagerTests(); });
         addTest("Actions - Basic", [](){ return new (std::nothrow) ActionsTests(); });

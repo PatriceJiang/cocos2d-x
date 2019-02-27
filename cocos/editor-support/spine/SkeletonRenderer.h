@@ -33,6 +33,7 @@
 
 #include <spine/spine.h>
 #include "cocos2d.h"
+#include "renderer/backend/Types.h"
 
 namespace spine {
 
@@ -47,7 +48,6 @@ public:
 
 	virtual void update (float deltaTime) override;
 	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
-	virtual void drawSkeleton (const cocos2d::Mat4& transform, uint32_t transformFlags);
 	virtual cocos2d::Rect getBoundingBox () const override;
 	virtual void onEnter () override;
 	virtual void onExit () override;
@@ -118,8 +118,10 @@ protected:
 
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;
-	cocos2d::TrianglesCommand _drawCommand;
+    std::vector<cocos2d::V3F_C4B_T2F> _vertexData;
 	cocos2d::BlendFunc _blendFunc;
+    cocos2d::DrawNode *_debugSlotNode = nullptr;
+    cocos2d::DrawNode *_debugBoneNode = nullptr;
 	PolygonBatch* _batch;
 	float* _worldVertices;
 	bool _premultipliedAlpha;

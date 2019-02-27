@@ -44,8 +44,6 @@ PolygonBatch* PolygonBatch::createWithCapacity (ssize_t capacity) {
 
 PolygonBatch::PolygonBatch () :
 	_capacity(0),
-	_vertices(nullptr), _verticesCount(0),
-	_triangles(nullptr), _trianglesCount(0),
 	_texture(nullptr)
 {}
 
@@ -54,34 +52,48 @@ bool PolygonBatch::initWithCapacity (ssize_t capacity) {
 	CCASSERT(capacity <= 10920, "capacity cannot be > 10920");
 	CCASSERT(capacity >= 0, "capacity cannot be < 0");
 	_capacity = capacity;
-	_vertices = MALLOC(V2F_C4B_T2F, capacity);
-	_triangles = MALLOC(GLushort, capacity * 3);
+	_vertices.reserve(capacity);
+	_triangles.reserve(capacity * 3);
+    
+    _programState = new backend::ProgramState(positionTextureColor_vert, positionTextureColor_frag);
+    auto &pipelineDescriptor = _customCommand.getPipelineDescriptor();
+
+    auto &layout = pipelineDescriptor.vertexLayout;
+    layout.setAtrribute("a_position", 0, backend::VertexFormat::FLOAT2, 0, false);
+    layout.setAtrribute("a_texCoord", 1, backend::VertexFormat::FLOAT2, offsetof(V2F_C4B_T2F, texCoords), false);
+    layout.setAtrribute("a_color", 2, backend::VertexFormat::UBYTE4, offsetof(V2F_C4B_T2F, colors), true);
+    layout.setLayout(sizeof(V2F_C4B_T2F), backend::VertexStepMode::VERTEX);
+
+    _locMVP = _programState->getUniformLocation("u_MVPMatrix");
+    _locTexture = _programState->getUniformLocation("u_texture");
+
+    pipelineDescriptor.programState = _programState;
 	return true;
 }
 
 PolygonBatch::~PolygonBatch () {
-	FREE(_vertices);
-	FREE(_triangles);
+    CC_SAFE_RELEASE_NULL(_programState);
 }
 
-void PolygonBatch::add (const Texture2D* addTexture,
+void PolygonBatch::add (const cocos2d::Mat4 &mat, const Texture2D* addTexture,
 		const float* addVertices, const float* uvs, int addVerticesCount,
 		const int* addTriangles, int addTrianglesCount,
 		Color4B* color) {
 
 	if (
 		addTexture != _texture
-		|| _verticesCount + (addVerticesCount >> 1) > _capacity
-		|| _trianglesCount + addTrianglesCount > _capacity * 3) {
-		this->flush();
+		|| _vertices.size() + (addVerticesCount >> 1) > _capacity
+		|| _triangles.size() + addTrianglesCount > _capacity * 3) {
+		this->flush(mat);
 		_texture = addTexture;
 	}
+    int triangleCount = _triangles.size();
+    int verticesCount = _vertices.size();
+	for (int i = 0; i < addTrianglesCount; ++i, ++triangleCount)
+		_triangles[triangleCount] = addTriangles[i] + verticesCount;
 
-	for (int i = 0; i < addTrianglesCount; ++i, ++_trianglesCount)
-		_triangles[_trianglesCount] = addTriangles[i] + _verticesCount;
-
-	for (int i = 0; i < addVerticesCount; i += 2, ++_verticesCount) {
-		V2F_C4B_T2F* vertex = _vertices + _verticesCount;
+	for (int i = 0; i < addVerticesCount; i += 2, ++verticesCount) {
+		V2F_C4B_T2F* vertex = &_vertices[verticesCount];
 		vertex->vertices.x = addVertices[i];
 		vertex->vertices.y = addVertices[i + 1];
 		vertex->colors = *color;
@@ -90,26 +102,38 @@ void PolygonBatch::add (const Texture2D* addTexture,
 	}
 }
 
-void PolygonBatch::flush () {
-	if (!_verticesCount) return;
+void PolygonBatch::flush(const cocos2d::Mat4 &mat) {
+	if (!_vertices.size()) return;
 
-	GL::bindTexture2D(_texture->getName());
-	GL::bindVAO(0);
-	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_POSITION);
-	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_COLOR);
-	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_TEX_COORDS);
-	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), &_vertices[0].vertices);
-	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V2F_C4B_T2F), &_vertices[0].colors);
-	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORDS, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), &_vertices[0].texCoords);
+    auto *renderer = Director::getInstance()->getRenderer();
 
-	glDrawElements(GL_TRIANGLES, _trianglesCount, GL_UNSIGNED_SHORT, _triangles);
+    auto pMatrix = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+    auto fMatrix = pMatrix * mat;
 
-	CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, _verticesCount);
+    _programState->setUniform(_locMVP, &fMatrix.m, sizeof(fMatrix.m));
+    _programState->setTexture(_locTexture, 0, _texture->getBackendTexture());
 
-	_verticesCount = 0;
-	_trianglesCount = 0;
+    _customCommand.createVertexBuffer(sizeof(V2F_C4B_T2F), _vertices.size(), CustomCommand::BufferUsage::DYNAMIC);
+    _customCommand.createIndexBuffer(CustomCommand::IndexFormat::U_SHORT, _triangles.size(), CustomCommand::BufferUsage::DYNAMIC);
+
+    _customCommand.updateIndexBuffer(_triangles.data(), sizeof(_triangles[0]) * _triangles.size());
+    _customCommand.updateVertexBuffer(_vertices.data(), sizeof(_vertices[0]) * _vertices.size());
+
+	CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, _vertices.size());
+
+    _vertices.resize(0);
+    _triangles.resize(0);
+    renderer->addCommand(&_customCommand);
 
 	CHECK_GL_ERROR_DEBUG();
+}
+
+void PolygonBatch::setBlend(cocos2d::backend::BlendFactor src, cocos2d::backend::BlendFactor dst)
+{
+    auto &desciptor = _customCommand.getPipelineDescriptor().blendDescriptor;
+    desciptor.blendEnabled = true;
+    desciptor.sourceAlphaBlendFactor = desciptor.sourceRGBBlendFactor = src;
+    desciptor.destinationAlphaBlendFactor = desciptor.destinationRGBBlendFactor = dst;
 }
 
 }
