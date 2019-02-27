@@ -42,30 +42,31 @@ protected:
     std::string    _title;
 };
 
-class BatchingExample: public SpineTestLayer {
-public:
-    CREATE_FUNC(BatchingExample);
-    ~BatchingExample ();
-    
-    virtual bool init ();
-    
-protected:
-    spAtlas* _atlas;
-    spAttachmentLoader* _attachmentLoader;
-    spSkeletonData* _skeletonData;
-    spAnimationStateData* _stateData;
-};
+//class BatchingExample: public SpineTestLayer {
+//public:
+//    CREATE_FUNC(BatchingExample);
+//    ~BatchingExample ();
+//    
+//    virtual bool init ();
+//    
+//protected:
+//    spAtlas* _atlas;
+//    spAttachmentLoader* _attachmentLoader;
+//    spSkeletonData* _skeletonData;
+//    spAnimationStateData* _stateData;
+//};
 
-class CoinExample: public SpineTestLayer
-{
-public:
-    CREATE_FUNC(CoinExample);
-    
-    virtual bool init();
-    
-private:
-    spine::SkeletonAnimation* skeletonNode;
-};
+////test case not exists in spine-2.1.25
+//class CoinExample: public SpineTestLayer
+//{
+//public:
+//    CREATE_FUNC(CoinExample);
+//    
+//    virtual bool init();
+//    
+//private:
+//    spine::SkeletonAnimation* skeletonNode;
+//};
 
 class GoblinsExample : public SpineTestLayer {
 public:
@@ -99,14 +100,15 @@ private:
     spine::SkeletonAnimation* skeletonNode;
 };
 
-class TankExample : public SpineTestLayer {
-public:
-    CREATE_FUNC(TankExample);
-    
-    virtual bool init ();
-    
-private:
-    spine::SkeletonAnimation* skeletonNode;
-};
+////test case not exists in spine-2.1.25
+//class TankExample : public SpineTestLayer {
+//public:
+//    CREATE_FUNC(TankExample);
+//    
+//    virtual bool init ();
+//    
+//private:
+//    spine::SkeletonAnimation* skeletonNode;
+//};
 
 #endif // _EXAMPLELAYER_H_

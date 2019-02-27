@@ -1,6 +1,5 @@
 
-goblins.png
-size: 1024,128
+goblins-mesh.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
