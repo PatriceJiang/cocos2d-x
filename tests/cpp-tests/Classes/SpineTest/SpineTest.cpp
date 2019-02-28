@@ -144,6 +144,9 @@ bool GoblinsExample::init () {
 
     Size windowSize = Director::getInstance()->getWinSize();
     skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
+
+    skeletonNode->setScale(0.5);
+
     addChild(skeletonNode);
 
     scheduleUpdate();
@@ -176,6 +179,7 @@ bool RaptorExample::init () {
 
     Size windowSize = Director::getInstance()->getWinSize();
     skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
+    skeletonNode->setScale(0.5);
     addChild(skeletonNode);
 
     scheduleUpdate();
@@ -233,6 +237,7 @@ bool SpineboyExample::init () {
 
     Size windowSize = Director::getInstance()->getWinSize();
     skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
+    skeletonNode->setScale(0.5);
     addChild(skeletonNode);
 
     scheduleUpdate();

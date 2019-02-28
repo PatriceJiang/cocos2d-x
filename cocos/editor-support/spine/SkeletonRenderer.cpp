@@ -255,12 +255,12 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
             _debugBoneNode->clear();
 
             auto colorRed = Color4F(1.f, 0.f, 0.f, 1.f);
-            _debugSlotNode->setLineWidth(2.0);
+            _debugBoneNode->setLineWidth(2.0);
             for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
                 spBone *bone = _skeleton->bones[i];
                 float x = bone->data->length * bone->m00 + bone->worldX;
                 float y = bone->data->length * bone->m10 + bone->worldY;
-                _debugSlotNode->drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y), colorRed);
+                _debugBoneNode->drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y), colorRed);
             }
             // Bone origins.
 
