@@ -125,8 +125,6 @@ void PolygonBatch::flush(const cocos2d::Mat4 &mat) {
     _vertices.resize(0);
     _triangles.resize(0);
     renderer->addCommand(&_customCommand);
-
-	CHECK_GL_ERROR_DEBUG();
 }
 
 void PolygonBatch::setBlend(cocos2d::backend::BlendFactor src, cocos2d::backend::BlendFactor dst)
