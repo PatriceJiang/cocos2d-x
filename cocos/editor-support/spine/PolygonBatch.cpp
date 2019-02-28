@@ -114,8 +114,14 @@ void PolygonBatch::flush(const cocos2d::Mat4 &mat) {
     _programState->setUniform(_locMVP, &fMatrix.m, sizeof(fMatrix.m));
     _programState->setTexture(_locTexture, 0, _texture->getBackendTexture());
 
-    _customCommand.createVertexBuffer(sizeof(V2F_C4B_T2F), _vertices.size(), CustomCommand::BufferUsage::DYNAMIC);
-    _customCommand.createIndexBuffer(CustomCommand::IndexFormat::U_SHORT, _triangles.size(), CustomCommand::BufferUsage::DYNAMIC);
+    if(_customCommand.getVertexCapacity() !=  _vertices.size())
+    {
+        _customCommand.createVertexBuffer(sizeof(V2F_C4B_T2F), _vertices.size(), CustomCommand::BufferUsage::DYNAMIC);
+    }
+    if(_customCommand.getIndexCapacity() != _triangles.size())
+    {
+        _customCommand.createIndexBuffer(CustomCommand::IndexFormat::U_SHORT, _triangles.size(), CustomCommand::BufferUsage::DYNAMIC);
+    }
 
     _customCommand.updateIndexBuffer(_triangles.data(), sizeof(_triangles[0]) * _triangles.size());
     _customCommand.updateVertexBuffer(_vertices.data(), sizeof(_vertices[0]) * _vertices.size());
