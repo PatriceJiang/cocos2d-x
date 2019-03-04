@@ -56,13 +56,13 @@ bool PolygonBatch::initWithCapacity (ssize_t capacity) {
 	_triangles.reserve(capacity * 3);
     
     _programState = new backend::ProgramState(positionTextureColor_vert, positionTextureColor_frag);
-    auto &pipelineDescriptor = _customCommand.getPipelineDescriptor();
+    auto &pipelineDescriptor = _triangleCommand.getPipelineDescriptor();
 
     auto &layout = pipelineDescriptor.vertexLayout;
-    layout.setAtrribute("a_position", 0, backend::VertexFormat::FLOAT2, 0, false);
-    layout.setAtrribute("a_texCoord", 1, backend::VertexFormat::FLOAT2, offsetof(V2F_C4B_T2F, texCoords), false);
-    layout.setAtrribute("a_color", 2, backend::VertexFormat::UBYTE4, offsetof(V2F_C4B_T2F, colors), true);
-    layout.setLayout(sizeof(V2F_C4B_T2F), backend::VertexStepMode::VERTEX);
+    layout.setAtrribute("a_position", 0, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
+    layout.setAtrribute("a_texCoord", 1, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
+    layout.setAtrribute("a_color", 2, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
+    layout.setLayout(sizeof(V3F_C4B_T2F), backend::VertexStepMode::VERTEX);
 
     _locMVP = _programState->getUniformLocation("u_MVPMatrix");
     _locTexture = _programState->getUniformLocation("u_texture");
@@ -75,7 +75,7 @@ PolygonBatch::~PolygonBatch () {
     CC_SAFE_RELEASE_NULL(_programState);
 }
 
-void PolygonBatch::add (const cocos2d::Mat4 &mat, const Texture2D* addTexture,
+void PolygonBatch::add (const cocos2d::Mat4 &mat, Texture2D* addTexture,
 		const float* addVertices, const float* uvs, int addVerticesCount,
 		const int* addTriangles, int addTrianglesCount,
 		Color4B* color) {
@@ -93,9 +93,10 @@ void PolygonBatch::add (const cocos2d::Mat4 &mat, const Texture2D* addTexture,
 		_triangles.push_back(addTriangles[i] + verticesCount);
 
 	for (int i = 0; i < addVerticesCount; i += 2) {
-        V2F_C4B_T2F vertex;
+        V3F_C4B_T2F vertex;
 		vertex.vertices.x = addVertices[i];
 		vertex.vertices.y = addVertices[i + 1];
+        vertex.vertices.z = 0.0f;
 		vertex.colors = *color;
 		vertex.texCoords.u = uvs[i];
 		vertex.texCoords.v = uvs[i + 1];
@@ -111,34 +112,23 @@ void PolygonBatch::flush(const cocos2d::Mat4 &mat) {
     auto pMatrix = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     auto fMatrix = pMatrix * mat;
 
-    _programState->setUniform(_locMVP, &fMatrix.m, sizeof(fMatrix.m));
+    _programState->setUniform(_locMVP, &pMatrix.m, sizeof(pMatrix.m));
     _programState->setTexture(_locTexture, 0, _texture->getBackendTexture());
 
-    if(_customCommand.getVertexCapacity() !=  _vertices.size())
-    {
-        _customCommand.createVertexBuffer(sizeof(V2F_C4B_T2F), _vertices.size(), CustomCommand::BufferUsage::DYNAMIC);
-    }
-    if(_customCommand.getIndexCapacity() != _triangles.size())
-    {
-        _customCommand.createIndexBuffer(CustomCommand::IndexFormat::U_SHORT, _triangles.size(), CustomCommand::BufferUsage::DYNAMIC);
-    }
+    TrianglesCommand::Triangles triangles(_vertices.data(), _triangles.data(), _vertices.size(), _triangles.size());
 
-    _customCommand.updateIndexBuffer(_triangles.data(), sizeof(_triangles[0]) * _triangles.size());
-    _customCommand.updateVertexBuffer(_vertices.data(), sizeof(_vertices[0]) * _vertices.size());
+    _triangleCommand.init(0.0f, _texture, _blendFunc, triangles, mat, 0);
 
 	CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, _vertices.size());
 
-    _vertices.resize(0);
+    _vertices.resize(0);    //will data be deallocated ??
     _triangles.resize(0);
-    renderer->addCommand(&_customCommand);
+    renderer->addCommand(&_triangleCommand);
 }
 
 void PolygonBatch::setBlend(cocos2d::backend::BlendFactor src, cocos2d::backend::BlendFactor dst)
 {
-    auto &desciptor = _customCommand.getPipelineDescriptor().blendDescriptor;
-    desciptor.blendEnabled = true;
-    desciptor.sourceAlphaBlendFactor = desciptor.sourceRGBBlendFactor = src;
-    desciptor.destinationAlphaBlendFactor = desciptor.destinationRGBBlendFactor = dst;
+    _blendFunc = { src, dst };
 }
 
 }

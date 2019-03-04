@@ -39,7 +39,7 @@ class PolygonBatch : public cocos2d::Ref {
 public:
 	static PolygonBatch* createWithCapacity (ssize_t capacity);
 
-	void add (const cocos2d::Mat4 &mat, const cocos2d::Texture2D* texture,
+	void add (const cocos2d::Mat4 &mat, cocos2d::Texture2D* texture,
 		const float* vertices, const float* uvs, int verticesCount,
 		const int* triangles, int trianglesCount,
 		cocos2d::Color4B* color);
@@ -51,12 +51,13 @@ protected:
 	PolygonBatch();
 	virtual ~PolygonBatch();
 	bool initWithCapacity (ssize_t capacity);
-    cocos2d::CustomCommand _customCommand;
+    cocos2d::TrianglesCommand _triangleCommand;
+    cocos2d::BlendFunc _blendFunc;
     cocos2d::backend::ProgramState *_programState = nullptr;
 	ssize_t _capacity;
-	std::vector<cocos2d::V2F_C4B_T2F> _vertices;
+	std::vector<cocos2d::V3F_C4B_T2F> _vertices;
 	std::vector<uint16_t> _triangles;
-	const cocos2d::Texture2D* _texture;
+	cocos2d::Texture2D* _texture;
     cocos2d::backend::UniformLocation _locMVP;
     cocos2d::backend::UniformLocation _locTexture;
 };
