@@ -130,7 +130,7 @@ elseif(LINUX)
         platform/linux/CCFileUtils-linux.cpp
         platform/linux/CCCommon-linux.cpp
         platform/linux/CCApplication-linux.cpp
-        platform/linux/CCDevice-linux.cpp
+        #platform/linux/CCDevice-linux.cpp
         platform/desktop/CCGLViewImpl-desktop.cpp
         )
 endif()

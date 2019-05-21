@@ -32,7 +32,9 @@ project(Cocos2d-x)
 
 # cocos2dx root path
 set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
+list(APPEND CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
+
+message(STATUS "[Cocos2d-x] MODULE_PATH    -> ${CMAKE_MODULE_PATH}")
 
 # prevent in-source-build
 include(PreventInSourceBuilds)
