@@ -33,12 +33,59 @@ namespace cocos2d {
     }
 }
 
-namespace {
+namespace cocos2d{
     void _nativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data) {
 
     }
 
-    int64_t callJavaSendBinary(int64_t cid, const char *data, size_t len) {
+    int64_t _callJavaConnect(const std::string &url,const std::vector<std::string> &protocals, const std::string & caFile)
+    {
+        jlong connectionID = -1;
+        JniMethodInfo methodInfo;
+        if (JniHelper::getStaticMethodInfo(methodInfo,
+                                           J_BINARY_CLS_WEBSOCKET,
+                                           "connect",
+                                           "(" JARG_STR "[" JARG_STR JARG_STR")J")) {
+            jstring jurl = methodInfo.env->NewStringUTF(url.c_str());
+            jstring jcaFile = methodInfo.env->NewStringUTF(caFile.c_str());
+
+            jclass stringClass = methodInfo.env->FindClass("java/lang/String");
+
+            jobjectArray jprotocals = methodInfo.env->NewObjectArray((jsize)protocals.size(), stringClass, methodInfo.env->NewStringUTF(""));
+            for(int i=0;i<protocals.size(); i++)
+            {
+                jstring item = methodInfo.env->NewStringUTF(protocals[i].c_str());
+                methodInfo.env->SetObjectArrayElement(jprotocals, i, item);
+            }
+
+            connectionID = methodInfo.env->CallStaticLongMethod(methodInfo.classID, methodInfo.methodID, jurl, jprotocals, jcaFile);
+            methodInfo.env->DeleteLocalRef(jurl);
+            methodInfo.env->DeleteLocalRef(jcaFile);
+            methodInfo.env->DeleteLocalRef(stringClass);
+            methodInfo.env->DeleteLocalRef(methodInfo.classID);
+        }
+
+        return connectionID;
+    }
+
+    void _callJavaDisconnect(int64_t cid)
+    {
+        jlong connectionID = -1;
+        JniMethodInfo methodInfo;
+        if (JniHelper::getStaticMethodInfo(methodInfo,
+                                           J_BINARY_CLS_WEBSOCKET,
+                                           "disconnect",
+                                           "(J)V")) {
+            jlong connectionID = cid;
+            methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, connectionID);
+            methodInfo.env->DeleteLocalRef(methodInfo.classID);
+        }
+
+    }
+
+
+    void _callJavaSendBinary(int64_t cid, const char *data, size_t len)
+    {
 
         JniMethodInfo methodInfo;
         if (JniHelper::getStaticMethodInfo(methodInfo,
@@ -46,55 +93,52 @@ namespace {
                                            "sendBinary",
                                            "(J"  JARG_STR JARG_STR")V")) {
             jlong connectionID = cid;
-            jstring jstrURL = methodInfo.env->New
-            //jstring jstrPath = methodInfo.env->NewStringUTF(task->storagePath.c_str());
-            methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, connectionID, nullptr);
-            methodInfo.env->DeleteLocalRef(jstrURL);
-            //methodInfo.env->DeleteLocalRef(jstrPath);
+            jbyteArray jdata = methodInfo.env->NewByteArray((jsize)len);
+            methodInfo.env->SetByteArrayRegion(jdata, 0, (jsize)len, (const jbyte *)data);
+            methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, connectionID, jdata);
+            methodInfo.env->DeleteLocalRef(jdata);
             methodInfo.env->DeleteLocalRef(methodInfo.classID);
         }
 
     }
-    /*
-    int64_t callJavaSendString(int64_t cid, const std::string &data) {
+
+    void _callJavaSendString(int64_t cid, const std::string &data) {
         JniMethodInfo methodInfo;
         if (JniHelper::getStaticMethodInfo(methodInfo,
                                            J_BINARY_CLS_WEBSOCKET,
                                            "sendString",
-                                           "(J[B)V")) {
-            jstring jstrURL = methodInfo.env->NewStringUTF(task->requestURL.c_str());
-            jstring jstrPath = methodInfo.env->NewStringUTF(task->storagePath.c_str());
-            methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, _impl,
-                                                 coTask->id, jstrURL, jstrPath);
-            methodInfo.env->DeleteLocalRef(jstrURL);
-            methodInfo.env->DeleteLocalRef(jstrPath);
+                                           "(J"  JARG_STR JARG_STR")V")) {
+            jlong connectionID = cid;
+            jstring jdata = methodInfo.env->NewStringUTF(data.c_str());
+            methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, connectionID, jdata);
+            methodInfo.env->DeleteLocalRef(jdata);
             methodInfo.env->DeleteLocalRef(methodInfo.classID);
         }
-
     }
-     */
-}
-static JNINativeMethod sMethodTable[] = {
-        { "triggerEvent", "(J"JARG_STR JARG_STR ")V", (void*)_nativeTriggerEvent},
-        //{ "nativeOnFinish", "(III" JARG_STR "[B)V", (void*)_nativeOnFinish },
-};
 
-static bool _registerNativeMethods(JNIEnv* env)
-{
-    jclass clazz = env->FindClass(JCLS_WEBSOCKET);
-    if (clazz == NULL)
+    static JNINativeMethod sMethodTable[] = {
+            { "triggerEvent", "(J"JARG_STR JARG_STR ")V", (void*)_nativeTriggerEvent},
+            //{ "nativeOnFinish", "(III" JARG_STR "[B)V", (void*)_nativeOnFinish },
+    };
+
+    static bool _registerNativeMethods(JNIEnv* env)
     {
-        CCLOG("_registerNativeMethods: can't find java class:%s", JARG_DOWNLOADER);
-        return false;
-    }
-    if (JNI_OK != env->RegisterNatives(clazz, sMethodTable, sizeof(sMethodTable) / sizeof(sMethodTable[0])))
-    {
-        //DLLOG("_registerNativeMethods: failed");
-        if (env->ExceptionCheck())
+        jclass clazz = env->FindClass(JCLS_WEBSOCKET);
+        if (clazz == NULL)
         {
-            env->ExceptionClear();
+            CCLOG("_registerNativeMethods: can't find java class:%s", JARG_DOWNLOADER);
+            return false;
         }
-        return false;
+        if (JNI_OK != env->RegisterNatives(clazz, sMethodTable, sizeof(sMethodTable) / sizeof(sMethodTable[0])))
+        {
+            //DLLOG("_registerNativeMethods: failed");
+            if (env->ExceptionCheck())
+            {
+                env->ExceptionClear();
+            }
+            return false;
+        }
+        return true;
     }
-    return true;
 }
+
