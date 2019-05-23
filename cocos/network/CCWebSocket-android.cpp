@@ -16,26 +16,25 @@
 
 #include <string>
 #include <mutex>
+#include <unordered_map>
+
 using namespace std;
 
-static bool _registerNativeMethods(JNIEnv* env);
 
-namespace cocos2d {
-    bool registered = false;
-    namespace network {
-        void _preloadJavaWebSocketClass(JNIEnv* env)
-        {
-            if(!registered)
-            {
-                registered = _registerNativeMethods(env);
-            }
-        }
-    }
-}
+static std::unordered_map<int64_t, cocos2d::network::WebSocket *> socketMap;
 
 namespace cocos2d{
-    void _nativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data) {
 
+    static void _nativeTriggerEvent(::JNIEnv *env, ::jclass *klass, ::jlong cid, ::jstring eventName, ::jstring data, ::jboolean isBinary) {
+        auto itr = socketMap.find(cid);
+        if(itr != socketMap.end())
+        {
+            const char *ceventName = env->GetStringUTFChars(eventName, nullptr);
+            const char *cdata = env->GetStringUTFChars(data, nullptr);
+            itr->second->triggerEvent(ceventName, cdata, (bool)isBinary);
+            env->ReleaseStringUTFChars(eventName, ceventName);
+            env->ReleaseStringUTFChars(data, cdata);
+        }
     }
 
     int64_t _callJavaConnect(const std::string &url,const std::vector<std::string> &protocals, const std::string & caFile)
@@ -70,7 +69,6 @@ namespace cocos2d{
 
     void _callJavaDisconnect(int64_t cid)
     {
-        jlong connectionID = -1;
         JniMethodInfo methodInfo;
         if (JniHelper::getStaticMethodInfo(methodInfo,
                                            J_BINARY_CLS_WEBSOCKET,
@@ -84,7 +82,7 @@ namespace cocos2d{
     }
 
 
-    void _callJavaSendBinary(int64_t cid, const char *data, size_t len)
+    void _callJavaSendBinary(int64_t cid, const unsigned char *data, size_t len)
     {
 
         JniMethodInfo methodInfo;
@@ -117,21 +115,20 @@ namespace cocos2d{
     }
 
     static JNINativeMethod sMethodTable[] = {
-            { "triggerEvent", "(J"JARG_STR JARG_STR ")V", (void*)_nativeTriggerEvent},
-            //{ "nativeOnFinish", "(III" JARG_STR "[B)V", (void*)_nativeOnFinish },
+            { "triggerEvent", "(J" JARG_STR JARG_STR "B)V", (void*)_nativeTriggerEvent}
     };
 
     static bool _registerNativeMethods(JNIEnv* env)
     {
         jclass clazz = env->FindClass(JCLS_WEBSOCKET);
-        if (clazz == NULL)
+        if (clazz == nullptr)
         {
-            CCLOG("_registerNativeMethods: can't find java class:%s", JARG_DOWNLOADER);
+            CCLOGERROR("_registerNativeMethods: can't find java class:%s", JARG_DOWNLOADER);
             return false;
         }
         if (JNI_OK != env->RegisterNatives(clazz, sMethodTable, sizeof(sMethodTable) / sizeof(sMethodTable[0])))
         {
-            //DLLOG("_registerNativeMethods: failed");
+            CCLOGERROR("_registerNativeMethods: failed");
             if (env->ExceptionCheck())
             {
                 env->ExceptionClear();
@@ -139,6 +136,129 @@ namespace cocos2d{
             return false;
         }
         return true;
+    }
+}
+
+
+namespace cocos2d {
+    static bool registered = false;
+
+
+    namespace network {
+        void _preloadJavaWebSocketClass()
+        {
+            if(!registered)
+            {
+                registered = _registerNativeMethods(JniHelper::getEnv());
+            }
+        }
+
+        WebSocket::WebSocket()
+        {
+
+        }
+
+        WebSocket::~WebSocket()
+        {
+            if(_connectionID > 0)
+            {
+                socketMap.erase(_connectionID);
+            }
+        }
+
+        void WebSocket::closeAllConnections()
+        {
+
+        }
+
+        bool WebSocket::init(const cocos2d::network::WebSocket::Delegate &delegate,
+                             const std::string &url, const std::vector<std::string> *protocols,
+                             const std::string &caFilePath) {
+
+            _delegate = const_cast<Delegate*>(&delegate);
+            _url = url;
+            _caFilePath = caFilePath;
+            _readyState = State::CONNECTING;
+
+            if(_url.empty()) return false;
+
+            _connectionID = _callJavaConnect(url, *protocols, caFilePath);
+
+            if(_connectionID > 0)
+            {
+                socketMap.emplace(_connectionID, this);
+            }
+
+            return true;
+        }
+
+        void WebSocket::send(const std::string &message)
+        {
+            _callJavaSendString(_connectionID, message);
+        }
+
+        void WebSocket::send(const unsigned char *binaryMsg, unsigned int len)
+        {
+            _callJavaSendBinary(_connectionID, binaryMsg, len);
+        }
+
+        void WebSocket::close()
+        {
+            //TODO, wait for result
+            _callJavaDisconnect(_connectionID);
+        }
+
+        void WebSocket::closeAsync()
+        {
+            _callJavaDisconnect(_connectionID);
+        }
+
+        void WebSocket::triggerEvent(const std::string &eventName, const std::string &data,
+                                     bool binary)
+                                     {
+
+            if(eventName == "open")
+            {
+                std::lock_guard<std::mutex> guard(_readyStateMutex);
+                _readyState = State::OPEN;
+                _delegate->onOpen(this);
+            }
+            else if(eventName == "message")
+            {
+                Data msg;
+                msg.bytes = const_cast<char*>(data.c_str());
+                msg.len = data.size();
+                msg.isBinary = binary;
+                _delegate->onMessage(this, msg);
+            }
+            else if(eventName == "closing")
+            {
+                std::lock_guard<std::mutex> guard(_readyStateMutex);
+                _readyState = State::CLOSING;
+            }
+            else if(eventName == "closed")
+            {
+                std::lock_guard<std::mutex> guard(_readyStateMutex);
+                _readyState = State::CLOSED;
+                _delegate->onClose(this);
+            }
+            else if(eventName == "error")
+            {
+                std::lock_guard<std::mutex> guard(_readyStateMutex);
+                _readyState = State::CLOSED;
+                //TODO get reason
+                _delegate->onError(this, ErrorCode::UNKNOWN);
+            }
+            else
+            {
+                CCLOGERROR("WebSocket invalidate event name %s", eventName.c_str());
+            }
+
+        }
+
+        WebSocket::State WebSocket::getReadyState() {
+            return _readyState;
+        }
     }
 }
 

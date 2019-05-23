@@ -40,6 +40,10 @@
 #include "platform/CCPlatformMacros.h"
 #include "platform/CCStdC.h"
 
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#include "platform/android/jni/JniHelper.h"
+#endif
+
 struct lws;
 struct lws_protocols;
 struct lws_vhost;
@@ -222,6 +226,8 @@ public:
      */
     inline const std::string& getProtocol() const { return _selectedProtocol; }
 
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID)
+
 private:
 
     // The following callback functions are invoked in websocket thread
@@ -238,20 +244,13 @@ private:
 
 private:
 
-    std::mutex   _readyStateMutex;
-    State        _readyState;
-
-    std::string _url;
-
     std::vector<char> _receivedData;
 
     struct lws* _wsInstance;
     struct lws_protocols* _lwsProtocols;
     std::string _clientSupportedProtocols;
-    std::string _selectedProtocol;
 
     std::shared_ptr<std::atomic<bool>> _isDestroyed;
-    Delegate* _delegate;
 
     std::mutex _closeMutex;
     std::condition_variable _closeCondition;
@@ -266,12 +265,29 @@ private:
     };
     CloseState _closeState;
 
-    std::string _caFilePath;
 
     EventListenerCustom* _resetDirectorListener;
 
     friend class WsThreadHelper;
     friend class WebSocketCallbackWrapper;
+#else //Android platform
+private:
+    int64_t     _connectionID = -1;
+public:
+    void triggerEvent(const std::string& eventName, const std::string &data, bool binary);
+
+    //friend void ::cocos2d::_nativeTriggerEvent(::JNIEnv *env, ::jclass *klass, ::jlong cid, ::jstring eventName, ::jstring data, ::jboolean isBinary);
+#endif
+
+private:
+
+    std::mutex  _readyStateMutex;
+    State       _readyState;
+    Delegate*   _delegate;
+    std::string _selectedProtocol;
+    std::string _caFilePath;
+
+    std::string _url;
 };
 
 } // namespace network {

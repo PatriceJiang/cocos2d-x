@@ -6,7 +6,6 @@ if(ANDROID)
     set(COCOS_NETWORK_SRC
         network/HttpClient-android.cpp
         network/SocketIO.cpp
-        network/WebSocket.cpp
         network/CCDownloader.cpp
         network/CCDownloader-android.cpp
         network/Uri.cpp

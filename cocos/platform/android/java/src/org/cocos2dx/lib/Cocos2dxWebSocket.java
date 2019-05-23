@@ -46,7 +46,7 @@ public class Cocos2dxWebSocket {
 
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
-            super.onClosing(webSocket, code, reason);
+            triggerEventDispatch(connectionID, "closing", reason, false);
         }
 
         @Override
