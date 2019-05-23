@@ -88,7 +88,7 @@ public class Cocos2dxWebSocket {
     public static void disconnect(long connectionID) {
         WebSocket socket = socketMap.get(connectionID);
         if(socket != null) {
-            socket.close(0, "manually close by client");
+            socket.close(1000, "manually close by client");
         }else {
             Log.e("[WebSocket]", "socket "+connectionID + " not found!");
         }

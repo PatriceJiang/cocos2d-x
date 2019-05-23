@@ -37,7 +37,7 @@ namespace cocos2d{
         }
     }
 
-    int64_t _callJavaConnect(const std::string &url,const std::vector<std::string> &protocals, const std::string & caFile)
+    int64_t _callJavaConnect(const std::string &url,const std::vector<std::string> *protocals, const std::string & caFile)
     {
         jlong connectionID = -1;
         JniMethodInfo methodInfo;
@@ -50,10 +50,12 @@ namespace cocos2d{
 
             jclass stringClass = methodInfo.env->FindClass("java/lang/String");
 
-            jobjectArray jprotocals = methodInfo.env->NewObjectArray((jsize)protocals.size(), stringClass, methodInfo.env->NewStringUTF(""));
-            for(int i=0;i<protocals.size(); i++)
+            size_t protocalLength = protocals == nullptr ? 0 : protocals->size();
+
+            jobjectArray jprotocals = methodInfo.env->NewObjectArray((jsize)protocalLength, stringClass, methodInfo.env->NewStringUTF(""));
+            for(int i = 0 ; i < protocalLength ; i++ )
             {
-                jstring item = methodInfo.env->NewStringUTF(protocals[i].c_str());
+                jstring item = methodInfo.env->NewStringUTF(protocals->at(i).c_str());
                 methodInfo.env->SetObjectArrayElement(jprotocals, i, item);
             }
 
@@ -89,7 +91,7 @@ namespace cocos2d{
         if (JniHelper::getStaticMethodInfo(methodInfo,
                                            J_BINARY_CLS_WEBSOCKET,
                                            "sendBinary",
-                                           "(J"  JARG_STR JARG_STR")V")) {
+                                           "(J[B)V")) {
             jlong connectionID = cid;
             jbyteArray jdata = methodInfo.env->NewByteArray((jsize)len);
             methodInfo.env->SetByteArrayRegion(jdata, 0, (jsize)len, (const jbyte *)data);
@@ -105,7 +107,7 @@ namespace cocos2d{
         if (JniHelper::getStaticMethodInfo(methodInfo,
                                            J_BINARY_CLS_WEBSOCKET,
                                            "sendString",
-                                           "(J"  JARG_STR JARG_STR")V")) {
+                                           "(J"  JARG_STR ")V")) {
             jlong connectionID = cid;
             jstring jdata = methodInfo.env->NewStringUTF(data.c_str());
             methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, connectionID, jdata);
@@ -115,7 +117,7 @@ namespace cocos2d{
     }
 
     static JNINativeMethod sMethodTable[] = {
-            { "triggerEvent", "(J" JARG_STR JARG_STR "B)V", (void*)_nativeTriggerEvent}
+            { "triggerEvent", "(J" JARG_STR JARG_STR "Z)V", (void*)_nativeTriggerEvent}
     };
 
     static bool _registerNativeMethods(JNIEnv* env)
@@ -182,7 +184,7 @@ namespace cocos2d {
 
             if(_url.empty()) return false;
 
-            _connectionID = _callJavaConnect(url, *protocols, caFilePath);
+            _connectionID = _callJavaConnect(url, protocols, caFilePath);
 
             if(_connectionID > 0)
             {
