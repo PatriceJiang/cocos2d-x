@@ -4,8 +4,10 @@ import android.util.Log;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -15,7 +17,7 @@ import okio.ByteString;
 @SuppressWarnings("unused")
 public class Cocos2dxWebSocket {
 
-    private static okhttp3.OkHttpClient client = new okhttp3.OkHttpClient();
+    private static okhttp3.OkHttpClient _client = null;
 
     private static AtomicLong connectionIdGenerator = new AtomicLong(10000);
 
@@ -51,6 +53,11 @@ public class Cocos2dxWebSocket {
 
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
+
+            //This procedure DOES NOT run in GL thread, so that this message will not be blocked
+            //in task queue.
+            triggerEvent(connectionID, "sync-closed", "", false);
+
             triggerEventDispatch(connectionID, "closed", reason, false);
         }
 
@@ -58,6 +65,17 @@ public class Cocos2dxWebSocket {
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
             triggerEventDispatch(connectionID, "error", t.getMessage(), false);
         }
+    }
+
+    private static okhttp3.OkHttpClient getClient() {
+        if(_client != null) {
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.connectTimeout(40, TimeUnit.SECONDS)
+                    .readTimeout(40, TimeUnit.SECONDS)
+                    .writeTimeout(40, TimeUnit.SECONDS);
+            _client = builder.build();
+        }
+        return _client;
     }
 
     public static long connect(String url, String[] protocals, String caPath) {
@@ -79,7 +97,7 @@ public class Cocos2dxWebSocket {
         //TODO set self-signed CA
         Request request = builder.url(url).build();
         LocalWebSocketListener listener = new LocalWebSocketListener(connectionId);
-        WebSocket socket = client.newWebSocket(request, listener);
+        WebSocket socket = getClient().newWebSocket(request, listener);
 
         socketMap.put(connectionId, socket);
         return connectionId;

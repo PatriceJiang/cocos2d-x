@@ -12,20 +12,98 @@
 #define J_BINARY_CLS_WEBSOCKET "org.cocos2dx.lib.Cocos2dxWebSocket"
 #define JARG_STR        "Ljava/lang/String;"
 #define JARG_DOWNLOADER "L" JCLS_WEBSOCKET ";"
-#define JARG_TASK       "L" JCLS_TASK ";"
 
 #include <string>
 #include <mutex>
 #include <unordered_map>
+#include <condition_variable>
+#include <chrono>
 
 using namespace std;
 
-
+static std::mutex socketMapMtx;
 static std::unordered_map<int64_t, cocos2d::network::WebSocket *> socketMap;
+
+namespace {
+
+    struct ConditionVariable {
+        std::mutex mutex;
+        std::condition_variable cond;
+    };
+
+    class NotifyProxy {
+    public:
+        NotifyProxy() = default;
+
+        virtual ~NotifyProxy() {
+            std::lock_guard<std::mutex> guard(_mtx);
+            for(auto &it : _conditions)
+            {
+                delete it.second;
+            }
+            _conditions.clear();
+        }
+
+        void regId(int64_t id)
+        {
+            std::lock_guard<std::mutex> guard(_mtx);
+            CCASSERT(_conditions.find(id) == _conditions.end(), "id should not be registered before");
+            auto * p = new ConditionVariable();
+            _conditions.emplace(id, p);
+        }
+
+        void notifyId(int64_t id)
+        {
+            ConditionVariable *p = nullptr;
+            {
+                std::lock_guard<std::mutex> guard(_mtx);
+                auto itr = _conditions.find(id);
+                if(itr == _conditions.end())
+                {
+                    return;
+                }
+                p = itr->second;
+            }
+            {
+                std::unique_lock<std::mutex> guard(p->mutex);
+                p->cond.notify_all();
+            }
+        }
+
+        void waitForId(int64_t id, std::chrono::duration<float> timeout)
+        {
+            ConditionVariable *p = nullptr;
+            {
+                std::lock_guard<std::mutex> guard(_mtx);
+                auto itr = _conditions.find(id);
+                if(itr == _conditions.end())
+                {
+                    return;
+                }
+                p = itr->second;
+            }
+            {
+                std::unique_lock<std::mutex> ul(p->mutex);
+                p->cond.wait_for(ul, timeout);
+            }
+            {
+                std::lock_guard<std::mutex> guard(_mtx);
+                delete p;
+                _conditions.erase(id);
+            }
+        }
+
+    private:
+        std::mutex _mtx;
+        std::unordered_map<int64_t, ConditionVariable*> _conditions;
+    };
+}
+
 
 namespace cocos2d{
 
     static void _nativeTriggerEvent(::JNIEnv *env, ::jclass *klass, ::jlong cid, ::jstring eventName, ::jstring data, ::jboolean isBinary) {
+        std::lock_guard<std::mutex> guard(socketMapMtx);
         auto itr = socketMap.find(cid);
         if(itr != socketMap.end())
         {
@@ -53,7 +131,7 @@ namespace cocos2d{
             size_t protocalLength = protocals == nullptr ? 0 : protocals->size();
 
             jobjectArray jprotocals = methodInfo.env->NewObjectArray((jsize)protocalLength, stringClass, methodInfo.env->NewStringUTF(""));
-            for(int i = 0 ; i < protocalLength ; i++ )
+            for(unsigned int i = 0 ; i < protocalLength ; i++ )
             {
                 jstring item = methodInfo.env->NewStringUTF(protocals->at(i).c_str());
                 methodInfo.env->SetObjectArrayElement(jprotocals, i, item);
@@ -144,7 +222,7 @@ namespace cocos2d{
 
 namespace cocos2d {
     static bool registered = false;
-
+    static NotifyProxy notifyProxy;
 
     namespace network {
         void _preloadJavaWebSocketClass()
@@ -164,6 +242,7 @@ namespace cocos2d {
         {
             if(_connectionID > 0)
             {
+                std::lock_guard<std::mutex> guard(socketMapMtx);
                 socketMap.erase(_connectionID);
             }
         }
@@ -188,6 +267,7 @@ namespace cocos2d {
 
             if(_connectionID > 0)
             {
+                std::lock_guard<std::mutex> guard(socketMapMtx);
                 socketMap.emplace(_connectionID, this);
             }
 
@@ -206,8 +286,11 @@ namespace cocos2d {
 
         void WebSocket::close()
         {
-            //TODO, wait for result
+            notifyProxy.regId(_connectionID);
+
             _callJavaDisconnect(_connectionID);
+            //register conditional variable for connection
+            notifyProxy.waitForId(_connectionID, std::chrono::seconds(10));
         }
 
         void WebSocket::closeAsync()
@@ -240,6 +323,7 @@ namespace cocos2d {
             }
             else if(eventName == "closed")
             {
+                notifyProxy.notifyId(_connectionID);
                 std::lock_guard<std::mutex> guard(_readyStateMutex);
                 _readyState = State::CLOSED;
                 _delegate->onClose(this);
