@@ -322,6 +322,7 @@ namespace cocos2d{
             _callJavaDisconnect(_connectionID, true);
             __syncProxy.waitForClosing(_connectionID, std::chrono::seconds(5));
             //invoke callback in current thread
+            _readyState = State::CLOSED;
             _delegate->onClose(this);
         }
 
@@ -359,15 +360,14 @@ namespace cocos2d{
             }
             else if(eventName == "sync-closed")
             {
-                _readyState = State::CLOSED;
                 __syncProxy.notifyClosed(_connectionID);
             }
             else if(eventName == "error")
             {
                 _readyState = State::CLOSED;
-                ErrorCode code;
+                ErrorCode code = ErrorCode::UNKNOWN;
                 if(data == "TIME_OUT") {
-                    code = ErrorCode ::TIME_OUT;
+                    code = ErrorCode::TIME_OUT;
                 } else if (data == "CONNECTION_FAILURE") {
                     code = ErrorCode::CONNECTION_FAILURE;
                 } else {

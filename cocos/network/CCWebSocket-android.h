@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "CCPlatformMacros.h"
+#include "platform/CCPlatformMacros.h"
 
 namespace cocos2d {
     namespace network {

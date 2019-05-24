@@ -27,7 +27,8 @@ public class Cocos2dxWebSocket {
     private static Map<Long, WebSocketWrap> socketMap = new ConcurrentHashMap<>();
 
     private static final class WebSocketWrap {
-        public WebSocketWrap(WebSocket socket) {
+
+        WebSocketWrap(WebSocket socket) {
             this.socket = socket;
         }
 
@@ -64,14 +65,14 @@ public class Cocos2dxWebSocket {
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
             WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap.closed) return;
+            if(wrap != null && wrap.closed) return;
             triggerEventDispatch(connectionID, "open", response.message(), false);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap.closed) return;
+            if(wrap != null && wrap.closed) return;
 
             triggerEventDispatch(connectionID, "message", text, false);
         }
@@ -79,21 +80,21 @@ public class Cocos2dxWebSocket {
         @Override
         public void onMessage(WebSocket webSocket, ByteString bytes) {
             WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap.closed) return;
+            if(wrap != null && wrap.closed) return;
             triggerEventDispatch(connectionID, "message", bytes.toString(), true);
         }
 
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
             WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap.closed) return;
+            if(wrap != null && wrap.closed) return;
             triggerEventDispatch(connectionID, "closing", reason, false);
         }
 
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
             WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap.syncClose) {
+            if(wrap != null && wrap.syncClose) {
                 //This procedure DOES NOT run in GL thread, so that this message will not be blocked
                 //in task queue.
                 triggerEvent(connectionID, "sync-closed", "", false);
