@@ -54,13 +54,14 @@ struct lws_vhost;
 
 NS_CC_BEGIN
 
-#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
-void _WebSocketAndroidNativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data, jboolean isBinary);
-#endif
-
 class EventListenerCustom;
 
 namespace network {
+
+
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+void _WebSocketAndroidNativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data, jboolean isBinary);
+#endif
 
 class WsThreadHelper;
 
@@ -280,7 +281,7 @@ private:
 //public:
     void triggerEvent(const std::string& eventName, const std::string &data, bool binary);
 
-    friend void ::cocos2d::_WebSocketAndroidNativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data, jboolean isBinary);
+    friend void cocos2d::network::_WebSocketAndroidNativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data, jboolean isBinary);
 #endif
 
 private:
