@@ -23,8 +23,8 @@
 
 
 #include "network/CCWebSocket-android.h"
-
 #include "network/WebSocket.h"
+#include "platform/CCFileUtils.h"
 #include "platform/android/jni/JniHelper.h"
 
 
@@ -137,7 +137,14 @@ namespace cocos2d{
                                            "connect",
                                            "(" JARG_STR "[" JARG_STR JARG_STR")J")) {
             jstring jurl = methodInfo.env->NewStringUTF(url.c_str());
-            jstring jcaFile = methodInfo.env->NewStringUTF(caFile.c_str());
+
+            std::string caContent;
+
+            if(!caFile.empty()) {
+                caContent = FileUtils::getInstance()->getStringFromFile(caFile);
+            }
+
+            jstring jcaFile = methodInfo.env->NewStringUTF(caContent.c_str());
 
             jclass stringClass = methodInfo.env->FindClass("java/lang/String");
 

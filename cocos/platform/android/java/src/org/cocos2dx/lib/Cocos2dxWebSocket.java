@@ -2,13 +2,33 @@ package org.cocos2dx.lib;
 
 import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -131,7 +151,67 @@ public class Cocos2dxWebSocket {
         return _client;
     }
 
-    public static long connect(String url, String[] protocals, String caPath) {
+    private static SSLContext buildSSlContext(String caContent)  {
+        if(caContent == null || caContent.isEmpty()) return null;
+        ByteArrayInputStream is = null;
+        BufferedInputStream bis = null;
+        try {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(null, null);
+
+            is = new ByteArrayInputStream(caContent.getBytes());
+            bis = new BufferedInputStream(is);
+
+            CertificateFactory cff = CertificateFactory.getInstance("X.509");
+            while(bis.available() > 0) {
+                X509Certificate ce = (X509Certificate)cff.generateCertificate(bis);
+                String alias = ce.getSubjectX500Principal().getName();
+                ks.setCertificateEntry(alias, ce);
+            }
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(ks);
+            TrustManager[] trustManagers = tmf.getTrustManagers();
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(ks, null);
+            KeyManager[] keyManagers = kmf.getKeyManagers();
+
+            SSLContext ctx = SSLContext.getInstance("SSL");
+            ctx.init(keyManagers, trustManagers, new SecureRandom());
+
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } finally {
+            if(is!=null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+
+    public static long connect(String url, String[] protocals, String caContent) {
         Request.Builder builder = new Request.Builder();
         if(protocals != null && protocals.length > 0) {
             //join string
@@ -145,9 +225,10 @@ public class Cocos2dxWebSocket {
         }
 
 
-        long connectionId = connectionIdGenerator.incrementAndGet();
-        //TODO set timeout
         //TODO set self-signed CA
+        SSLContext ctx = buildSSlContext(caContent);
+
+        long connectionId = connectionIdGenerator.incrementAndGet();
         Request request = builder.url(url).build();
         LocalWebSocketListener listener = new LocalWebSocketListener(connectionId);
         WebSocket socket = getClient().newWebSocket(request, listener);
