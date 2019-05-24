@@ -54,6 +54,10 @@ struct lws_vhost;
 
 NS_CC_BEGIN
 
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+void _WebSocketAndroidNativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data, jboolean isBinary);
+#endif
+
 class EventListenerCustom;
 
 namespace network {
@@ -263,9 +267,9 @@ private:
         SYNC_CLOSED,
         ASYNC_CLOSING
     };
+    
     CloseState _closeState;
-
-
+    std::mutex  _readyStateMutex;
     EventListenerCustom* _resetDirectorListener;
 
     friend class WsThreadHelper;
@@ -273,17 +277,16 @@ private:
 #else //Android platform
 private:
     int64_t     _connectionID = -1;
-public:
+//public:
     void triggerEvent(const std::string& eventName, const std::string &data, bool binary);
 
-    //friend void ::cocos2d::_nativeTriggerEvent(::JNIEnv *env, ::jclass *klass, ::jlong cid, ::jstring eventName, ::jstring data, ::jboolean isBinary);
+    friend void ::cocos2d::_WebSocketAndroidNativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data, jboolean isBinary);
 #endif
 
 private:
 
-    std::mutex  _readyStateMutex;
     State       _readyState;
-    Delegate*   _delegate;
+    Delegate*   _delegate  = nullptr;
     std::string _selectedProtocol;
     std::string _caFilePath;
 

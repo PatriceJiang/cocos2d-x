@@ -2,6 +2,9 @@ package org.cocos2dx.lib;
 
 import android.util.Log;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +24,32 @@ public class Cocos2dxWebSocket {
 
     private static AtomicLong connectionIdGenerator = new AtomicLong(10000);
 
-    private static Map<Long, WebSocket> socketMap = new ConcurrentHashMap<>();
+    private static Map<Long, WebSocketWrap> socketMap = new ConcurrentHashMap<>();
+
+    private static final class WebSocketWrap {
+        public WebSocketWrap(WebSocket socket) {
+            this.socket = socket;
+        }
+
+        public void close(boolean syncClose)
+        {
+            this.syncClose = syncClose;
+            this.socket.close(1000, "manually close by client");
+        }
+
+        public void send(String text) {
+            this.socket.send(text);
+        }
+
+        public void send(ByteString bs)
+        {
+            this.socket.send(bs);
+        }
+
+        private WebSocket socket;
+        private boolean  syncClose = false;
+
+    }
 
     private static final class LocalWebSocketListener extends WebSocketListener {
 
@@ -54,21 +82,36 @@ public class Cocos2dxWebSocket {
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
 
-            //This procedure DOES NOT run in GL thread, so that this message will not be blocked
-            //in task queue.
-            triggerEvent(connectionID, "sync-closed", "", false);
+            WebSocketWrap wrap = socketMap.get(connectionID);
 
-            triggerEventDispatch(connectionID, "closed", reason, false);
+            if(wrap.syncClose) {
+                //This procedure DOES NOT run in GL thread, so that this message will not be blocked
+                //in task queue.
+                triggerEvent(connectionID, "sync-closed", "", false);
+            }else {
+                triggerEventDispatch(connectionID, "closed", reason, false);
+            }
+
+            socketMap.remove(connectionID);
         }
 
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            triggerEventDispatch(connectionID, "error", t.getMessage(), false);
+            if(t instanceof UnknownHostException) {
+                triggerEventDispatch(connectionID, "error", "CONNECTION_FAILURE", false);
+            } else if (t instanceof  SocketTimeoutException) {
+                triggerEventDispatch(connectionID, "error", "TIME_OUT", false);
+            } else if (t instanceof ConnectException) {
+                triggerEventDispatch(connectionID, "error", "CONNECTION_FAILURE", false);
+            } else {
+                triggerEventDispatch(connectionID, "error", t.getMessage(), false);
+            }
+            socketMap.remove(connectionID);
         }
     }
 
     private static okhttp3.OkHttpClient getClient() {
-        if(_client != null) {
+        if(_client == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
             builder.connectTimeout(40, TimeUnit.SECONDS)
                     .readTimeout(40, TimeUnit.SECONDS)
@@ -99,14 +142,14 @@ public class Cocos2dxWebSocket {
         LocalWebSocketListener listener = new LocalWebSocketListener(connectionId);
         WebSocket socket = getClient().newWebSocket(request, listener);
 
-        socketMap.put(connectionId, socket);
+        socketMap.put(connectionId, new WebSocketWrap(socket));
         return connectionId;
     }
 
-    public static void disconnect(long connectionID) {
-        WebSocket socket = socketMap.get(connectionID);
+    public static void disconnect(long connectionID, boolean syncClose) {
+        WebSocketWrap socket = socketMap.get(connectionID);
         if(socket != null) {
-            socket.close(1000, "manually close by client");
+            socket.close(syncClose);
         }else {
             Log.e("[WebSocket]", "socket "+connectionID + " not found!");
         }
@@ -114,7 +157,7 @@ public class Cocos2dxWebSocket {
 
     public static void sendBinary(long connectionID, byte[] message)
     {
-        WebSocket socket = socketMap.get(connectionID);
+        WebSocketWrap socket = socketMap.get(connectionID);
         if(socket != null) {
             socket.send(ByteString.of(message));
         }else {
@@ -124,7 +167,7 @@ public class Cocos2dxWebSocket {
 
     public static void sendString(long connectionID, String message)
     {
-        WebSocket socket = socketMap.get(connectionID);
+        WebSocketWrap socket = socketMap.get(connectionID);
         if(socket != null) {
             socket.send(message);
         }else {

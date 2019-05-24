@@ -21,7 +21,7 @@
 
 using namespace std;
 
-static std::mutex socketMapMtx;
+static std::recursive_mutex socketMapMtx;
 static std::unordered_map<int64_t, cocos2d::network::WebSocket *> socketMap;
 
 namespace {
@@ -92,7 +92,6 @@ namespace {
                 _conditions.erase(id);
             }
         }
-
     private:
         std::mutex _mtx;
         std::unordered_map<int64_t, ConditionVariable*> _conditions;
@@ -102,8 +101,8 @@ namespace {
 
 namespace cocos2d{
 
-    static void _nativeTriggerEvent(::JNIEnv *env, ::jclass *klass, ::jlong cid, ::jstring eventName, ::jstring data, ::jboolean isBinary) {
-        std::lock_guard<std::mutex> guard(socketMapMtx);
+    void _WebSocketAndroidNativeTriggerEvent(JNIEnv *env, jclass *klass, jlong cid, jstring eventName, jstring data, jboolean isBinary) {
+        std::lock_guard<std::recursive_mutex> guard(socketMapMtx);
         auto itr = socketMap.find(cid);
         if(itr != socketMap.end())
         {
@@ -147,15 +146,15 @@ namespace cocos2d{
         return connectionID;
     }
 
-    void _callJavaDisconnect(int64_t cid)
+    void _callJavaDisconnect(int64_t cid, bool syncClose)
     {
         JniMethodInfo methodInfo;
         if (JniHelper::getStaticMethodInfo(methodInfo,
                                            J_BINARY_CLS_WEBSOCKET,
                                            "disconnect",
-                                           "(J)V")) {
+                                           "(JZ)V")) {
             jlong connectionID = cid;
-            methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, connectionID);
+            methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, connectionID, (jboolean) syncClose);
             methodInfo.env->DeleteLocalRef(methodInfo.classID);
         }
 
@@ -195,7 +194,7 @@ namespace cocos2d{
     }
 
     static JNINativeMethod sMethodTable[] = {
-            { "triggerEvent", "(J" JARG_STR JARG_STR "Z)V", (void*)_nativeTriggerEvent}
+            { "triggerEvent", "(J" JARG_STR JARG_STR "Z)V", (void*)_WebSocketAndroidNativeTriggerEvent}
     };
 
     static bool _registerNativeMethods(JNIEnv* env)
@@ -242,14 +241,18 @@ namespace cocos2d {
         {
             if(_connectionID > 0)
             {
-                std::lock_guard<std::mutex> guard(socketMapMtx);
+                std::lock_guard<std::recursive_mutex> guard(socketMapMtx);
                 socketMap.erase(_connectionID);
             }
         }
 
         void WebSocket::closeAllConnections()
         {
-
+            std::lock_guard<std::recursive_mutex> guard(socketMapMtx);
+            for(auto it : socketMap) {
+                it.second->closeAsync();
+            }
+            socketMap.clear();
         }
 
         bool WebSocket::init(const cocos2d::network::WebSocket::Delegate &delegate,
@@ -267,7 +270,7 @@ namespace cocos2d {
 
             if(_connectionID > 0)
             {
-                std::lock_guard<std::mutex> guard(socketMapMtx);
+                std::lock_guard<std::recursive_mutex> guard(socketMapMtx);
                 socketMap.emplace(_connectionID, this);
             }
 
@@ -286,16 +289,21 @@ namespace cocos2d {
 
         void WebSocket::close()
         {
-            notifyProxy.regId(_connectionID);
+            if(_readyState == State::OPEN) {
+                notifyProxy.regId(_connectionID);
 
-            _callJavaDisconnect(_connectionID);
-            //register conditional variable for connection
-            notifyProxy.waitForId(_connectionID, std::chrono::seconds(10));
+                _callJavaDisconnect(_connectionID, true);
+                notifyProxy.waitForId(_connectionID, std::chrono::seconds(10));
+                //invoke callback in current thread
+                _delegate->onClose(this);
+            }else {
+                closeAsync();
+            }
         }
 
         void WebSocket::closeAsync()
         {
-            _callJavaDisconnect(_connectionID);
+            _callJavaDisconnect(_connectionID, false);
         }
 
         void WebSocket::triggerEvent(const std::string &eventName, const std::string &data,
@@ -304,7 +312,6 @@ namespace cocos2d {
 
             if(eventName == "open")
             {
-                std::lock_guard<std::mutex> guard(_readyStateMutex);
                 _readyState = State::OPEN;
                 _delegate->onOpen(this);
             }
@@ -318,22 +325,30 @@ namespace cocos2d {
             }
             else if(eventName == "closing")
             {
-                std::lock_guard<std::mutex> guard(_readyStateMutex);
                 _readyState = State::CLOSING;
             }
             else if(eventName == "closed")
             {
-                notifyProxy.notifyId(_connectionID);
-                std::lock_guard<std::mutex> guard(_readyStateMutex);
                 _readyState = State::CLOSED;
                 _delegate->onClose(this);
             }
+            else if(eventName == "sync-closed")
+            {
+                _readyState = State::CLOSED;
+                notifyProxy.notifyId(_connectionID);
+            }
             else if(eventName == "error")
             {
-                std::lock_guard<std::mutex> guard(_readyStateMutex);
                 _readyState = State::CLOSED;
-                //TODO get reason
-                _delegate->onError(this, ErrorCode::UNKNOWN);
+                ErrorCode code;
+                if(data == "TIME_OUT") {
+                    code = ErrorCode ::TIME_OUT;
+                } else if (data == "CONNECTION_FAILURE") {
+                    code = ErrorCode::CONNECTION_FAILURE;
+                } else {
+                    CCLOGERROR("WebSocket unkown error %s", data.c_str());
+                }
+                _delegate->onError(this, code);
             }
             else
             {
