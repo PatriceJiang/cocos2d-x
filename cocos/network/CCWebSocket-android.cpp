@@ -52,6 +52,18 @@ namespace {
             _conditions.emplace(id, p);
         }
 
+        void unregId(int64_t id)
+        {
+            std::lock_guard<std::mutex> guard(_mtx);
+            auto itr = _conditions.find(id);
+            if(itr == _conditions.end())
+            {
+                return;
+            }
+            delete itr->second;
+            _conditions.erase(itr);
+        }
+
         void notifyId(int64_t id)
         {
             ConditionVariable *p = nullptr;
@@ -85,11 +97,6 @@ namespace {
             {
                 std::unique_lock<std::mutex> ul(p->mutex);
                 p->cond.wait_for(ul, timeout);
-            }
-            {
-                std::lock_guard<std::mutex> guard(_mtx);
-                delete p;
-                _conditions.erase(id);
             }
         }
     private:
@@ -234,7 +241,6 @@ namespace cocos2d {
 
         WebSocket::WebSocket()
         {
-
         }
 
         WebSocket::~WebSocket()
@@ -244,6 +250,7 @@ namespace cocos2d {
                 std::lock_guard<std::recursive_mutex> guard(socketMapMtx);
                 socketMap.erase(_connectionID);
             }
+            notifyProxy.unregId(_connectionID);
         }
 
         void WebSocket::closeAllConnections()
@@ -274,6 +281,8 @@ namespace cocos2d {
                 socketMap.emplace(_connectionID, this);
             }
 
+            notifyProxy.regId(_connectionID);
+
             return true;
         }
 
@@ -289,16 +298,10 @@ namespace cocos2d {
 
         void WebSocket::close()
         {
-            if(_readyState == State::OPEN) {
-                notifyProxy.regId(_connectionID);
-
-                _callJavaDisconnect(_connectionID, true);
-                notifyProxy.waitForId(_connectionID, std::chrono::seconds(10));
-                //invoke callback in current thread
-                _delegate->onClose(this);
-            }else {
-                closeAsync();
-            }
+            _callJavaDisconnect(_connectionID, true);
+            notifyProxy.waitForId(_connectionID, std::chrono::seconds(5));
+            //invoke callback in current thread
+            _delegate->onClose(this);
         }
 
         void WebSocket::closeAsync()
@@ -330,6 +333,7 @@ namespace cocos2d {
             else if(eventName == "closed")
             {
                 _readyState = State::CLOSED;
+                notifyProxy.notifyId(_connectionID);
                 _delegate->onClose(this);
             }
             else if(eventName == "sync-closed")
@@ -349,6 +353,7 @@ namespace cocos2d {
                     CCLOGERROR("WebSocket unkown error %s", data.c_str());
                 }
                 _delegate->onError(this, code);
+                notifyProxy.notifyId(_connectionID);
             }
             else
             {

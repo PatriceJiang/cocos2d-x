@@ -33,6 +33,7 @@ public class Cocos2dxWebSocket {
 
         public void close(boolean syncClose)
         {
+            this.closed = true;
             this.syncClose = syncClose;
             this.socket.close(1000, "manually close by client");
         }
@@ -47,7 +48,8 @@ public class Cocos2dxWebSocket {
         }
 
         private WebSocket socket;
-        private boolean  syncClose = false;
+        private boolean syncClose = false;
+        private boolean closed = false;
 
     }
 
@@ -61,29 +63,36 @@ public class Cocos2dxWebSocket {
 
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
+            WebSocketWrap wrap = socketMap.get(connectionID);
+            if(wrap.closed) return;
             triggerEventDispatch(connectionID, "open", response.message(), false);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {
+            WebSocketWrap wrap = socketMap.get(connectionID);
+            if(wrap.closed) return;
+
             triggerEventDispatch(connectionID, "message", text, false);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, ByteString bytes) {
+            WebSocketWrap wrap = socketMap.get(connectionID);
+            if(wrap.closed) return;
             triggerEventDispatch(connectionID, "message", bytes.toString(), true);
         }
 
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
+            WebSocketWrap wrap = socketMap.get(connectionID);
+            if(wrap.closed) return;
             triggerEventDispatch(connectionID, "closing", reason, false);
         }
 
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
-
             WebSocketWrap wrap = socketMap.get(connectionID);
-
             if(wrap.syncClose) {
                 //This procedure DOES NOT run in GL thread, so that this message will not be blocked
                 //in task queue.
