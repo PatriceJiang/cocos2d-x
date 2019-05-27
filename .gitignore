@@ -183,7 +183,4 @@ temp/
 # external libs zip
 *.zip
 
-**/simulator/
-
-
 **/.project
