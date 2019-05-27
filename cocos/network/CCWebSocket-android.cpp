@@ -49,11 +49,11 @@ namespace {
         std::condition_variable cond;
     };
 
-    class ConnectionSyncPipe {
+    class ConnectionCV {
     public:
-        ConnectionSyncPipe() = default;
+        ConnectionCV() = default;
 
-        virtual ~ConnectionSyncPipe() {
+        virtual ~ConnectionCV() {
             std::lock_guard<std::mutex> guard(_mtx);
             for(auto &it : _conditions)
             {
@@ -85,37 +85,30 @@ namespace {
         void notifyClosed(int64_t id)
         {
             ConditionVariable *p = nullptr;
+            std::lock_guard<std::mutex> guard(_mtx);
+            auto itr = _conditions.find(id);
+            if(itr == _conditions.end())
             {
-                std::lock_guard<std::mutex> guard(_mtx);
-                auto itr = _conditions.find(id);
-                if(itr == _conditions.end())
-                {
-                    return;
-                }
-                p = itr->second;
+                return;
             }
-            {
-                std::unique_lock<std::mutex> guard(p->mutex);
-                p->cond.notify_all();
-            }
+            p = itr->second;
+            std::unique_lock<std::mutex> guard(p->mutex);
+            p->cond.notify_all();
         }
 
         void waitForClosing(int64_t id, std::chrono::duration<float> timeout)
         {
             ConditionVariable *p = nullptr;
+
+            std::lock_guard<std::mutex> guard(_mtx);
+            auto itr = _conditions.find(id);
+            if(itr == _conditions.end())
             {
-                std::lock_guard<std::mutex> guard(_mtx);
-                auto itr = _conditions.find(id);
-                if(itr == _conditions.end())
-                {
-                    return;
-                }
-                p = itr->second;
+                return;
             }
-            {
-                std::unique_lock<std::mutex> ul(p->mutex);
-                p->cond.wait_for(ul, timeout);
-            }
+            p = itr->second;
+            std::unique_lock<std::mutex> ul(p->mutex);
+            p->cond.wait_for(ul, timeout);
         }
     private:
         std::mutex _mtx;
@@ -239,7 +232,7 @@ namespace cocos2d{
     }
 
     static bool __registered = false;
-    static ConnectionSyncPipe __syncPipe;
+    static ConnectionCV __syncPipe;
     static std::recursive_mutex __socketMapMtx;
     static std::unordered_map<int64_t, cocos2d::network::WebSocket *> __socketMap;
 
@@ -341,6 +334,7 @@ namespace cocos2d{
         void WebSocket::triggerEvent(const std::string &eventName, const std::string &data,
                                      bool binary)
                                      {
+            //all events except "sync-closed" are running in GL-thread
 
             if(eventName == "open")
             {
