@@ -156,18 +156,29 @@ public class Cocos2dxWebSocket {
         ByteArrayInputStream is = null;
         BufferedInputStream bis = null;
         try {
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            KeyStore ks = KeyStore.getInstance("PKCS12");
             ks.load(null, null);
 
             is = new ByteArrayInputStream(caContent.getBytes());
             bis = new BufferedInputStream(is);
 
-            CertificateFactory cff = CertificateFactory.getInstance("X.509");
-            while(bis.available() > 0) {
-                X509Certificate ce = (X509Certificate)cff.generateCertificate(bis);
-                String alias = ce.getSubjectX500Principal().getName();
-                ks.setCertificateEntry(alias, ce);
+            CertificateFactory cff = CertificateFactory.getInstance("X509");
+//            while(bis.available() > 0) {
+//                X509Certificate ce = (X509Certificate)cff.generateCertificate(bis);
+//                String alias = ce.getSubjectX500Principal().getName();
+//                ks.setCertificateEntry(alias, ce);
+//            }
+
+            Collection<? extends Certificate> certList = cff.generateCertificates(bis);
+            for(Certificate ce: certList) {
+                if(ce instanceof X509Certificate) {
+                    String alias = ((X509Certificate)ce).getSubjectX500Principal().getName();
+                    ks.setCertificateEntry(alias, ce);
+                }else{
+                    Log.e("[Websocket]", "invalidate certificate format " + ce.getClass().getSimpleName());
+                }
             }
+
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(ks);
@@ -177,7 +188,7 @@ public class Cocos2dxWebSocket {
             kmf.init(ks, null);
             KeyManager[] keyManagers = kmf.getKeyManagers();
 
-            SSLContext ctx = SSLContext.getInstance("SSL");
+            SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(keyManagers, trustManagers, new SecureRandom());
 
         } catch (KeyStoreException e) {
