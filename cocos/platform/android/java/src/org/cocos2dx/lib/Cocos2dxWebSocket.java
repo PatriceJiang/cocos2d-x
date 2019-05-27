@@ -12,16 +12,16 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.KeyManager;
@@ -29,6 +29,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -40,145 +41,199 @@ import okio.ByteString;
 @SuppressWarnings("unused")
 public class Cocos2dxWebSocket {
 
-    private static okhttp3.OkHttpClient _client = null;
+    private static WebSocketClientWrap __defaultClient = null;
 
-    private static AtomicLong connectionIdGenerator = new AtomicLong(10000);
+    private static AtomicLong __connectionIdGenerator = new AtomicLong(10000);
 
-    private static Map<Long, WebSocketWrap> socketMap = new ConcurrentHashMap<>();
+    private static Map<Long, WebSocketWrap> __socketMap = new ConcurrentHashMap<>();
+
+    private static Map<String, WebSocketClientWrap> __secureClientCache = new ConcurrentHashMap<>();
+
+    private static final class WebSocketClientWrap {
+        WebSocketClientWrap(OkHttpClient client, boolean defaultClient) {
+            this._client = client;
+            this._refCount = new AtomicInteger(0);
+            this._isDefaultClient = defaultClient;
+        }
+
+        void retain() {
+            this._refCount.incrementAndGet();
+        }
+
+        void release() {
+            if(this._refCount.decrementAndGet() <= 0) {
+                this.shutdown();
+            }
+        }
+
+        void shutdown() {
+            if(this._client!=null) {
+                this._client.dispatcher().executorService().shutdown();
+                for(String key : __secureClientCache.keySet()) {
+                    if(__secureClientCache.get(key) == this) {
+                        __secureClientCache.remove(key);
+                    }
+                }
+                this._client = null;
+            }
+        }
+
+        OkHttpClient getClient() {
+            return _client;
+        }
+
+        private OkHttpClient _client;
+        private AtomicInteger _refCount;
+        private boolean _isDefaultClient;
+    }
 
     private static final class WebSocketWrap {
 
-        WebSocketWrap(WebSocket socket) {
-            this.socket = socket;
+        WebSocketWrap(WebSocket socket, WebSocketClientWrap client) {
+            this._socket = socket;
+            this._client = client;
         }
 
         public void close(boolean syncClose)
         {
-            this.closed = true;
-            this.syncClose = syncClose;
-            this.socket.close(1000, "manually close by client");
+            this._closed = true;
+            this._syncClose = syncClose;
+            this._socket.close(1000, "manually close by client");
         }
 
         public void send(String text) {
-            this.socket.send(text);
+            this._socket.send(text);
         }
 
         public void send(ByteString bs)
         {
-            this.socket.send(bs);
+            this._socket.send(bs);
         }
 
-        private WebSocket socket;
-        private boolean syncClose = false;
-        private boolean closed = false;
+        private WebSocket _socket;
+        private boolean _syncClose = false;
+        private boolean _closed = false;
+        private WebSocketClientWrap _client;
 
     }
 
     private static final class LocalWebSocketListener extends WebSocketListener {
 
-        private long connectionID;
+        private long _connectionID;
 
         LocalWebSocketListener(long cid) {
-            this.connectionID = cid;
+            this._connectionID = cid;
         }
 
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
-            WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap != null && wrap.closed) return;
-            triggerEventDispatch(connectionID, "open", response.message(), false);
+            WebSocketWrap wrap = __socketMap.get(_connectionID);
+            if(wrap != null && wrap._closed) return;
+            triggerEventDispatch(_connectionID, "open", response.message(), false);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {
-            WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap != null && wrap.closed) return;
+            WebSocketWrap wrap = __socketMap.get(_connectionID);
+            if(wrap != null && wrap._closed) return;
 
-            triggerEventDispatch(connectionID, "message", text, false);
+            triggerEventDispatch(_connectionID, "message", text, false);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, ByteString bytes) {
-            WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap != null && wrap.closed) return;
-            triggerEventDispatch(connectionID, "message", bytes.toString(), true);
+            WebSocketWrap wrap = __socketMap.get(_connectionID);
+            if(wrap != null && wrap._closed) return;
+            triggerEventDispatch(_connectionID, "message", bytes.toString(), true);
         }
 
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
-            WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap != null && wrap.closed) return;
-            triggerEventDispatch(connectionID, "closing", reason, false);
+            WebSocketWrap wrap = __socketMap.get(_connectionID);
+            if(wrap != null && wrap._closed) return;
+            triggerEventDispatch(_connectionID, "closing", reason, false);
         }
 
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
-            WebSocketWrap wrap = socketMap.get(connectionID);
-            if(wrap != null && wrap.syncClose) {
+            WebSocketWrap wrap = __socketMap.get(_connectionID);
+            if(wrap != null && wrap._syncClose) {
                 //This procedure DOES NOT run in GL thread, so that this message will not be blocked
                 //in task queue.
-                triggerEvent(connectionID, "sync-closed", "", false);
+                triggerEvent(_connectionID, "sync-_closed", "", false);
             }else {
-                triggerEventDispatch(connectionID, "closed", reason, false);
+                triggerEventDispatch(_connectionID, "_closed", reason, false);
             }
-
-            socketMap.remove(connectionID);
+            if(wrap != null) {
+                wrap._client.release();
+            }
+            __socketMap.remove(_connectionID);
         }
 
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+            WebSocketWrap wrap = __socketMap.get(_connectionID);
+
             if(t instanceof UnknownHostException) {
-                triggerEventDispatch(connectionID, "error", "CONNECTION_FAILURE", false);
+                triggerEventDispatch(_connectionID, "error", "CONNECTION_FAILURE", false);
             } else if (t instanceof  SocketTimeoutException) {
-                triggerEventDispatch(connectionID, "error", "TIME_OUT", false);
+                triggerEventDispatch(_connectionID, "error", "TIME_OUT", false);
             } else if (t instanceof ConnectException) {
-                triggerEventDispatch(connectionID, "error", "CONNECTION_FAILURE", false);
+                triggerEventDispatch(_connectionID, "error", "CONNECTION_FAILURE", false);
             } else {
-                triggerEventDispatch(connectionID, "error", t.getMessage(), false);
+                triggerEventDispatch(_connectionID, "error", t.getMessage(), false);
             }
-            socketMap.remove(connectionID);
+            if(wrap != null) {
+                wrap._client.release();
+            }
+            __socketMap.remove(_connectionID);
         }
     }
 
-    private static okhttp3.OkHttpClient getClient() {
-        if(_client == null) {
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.connectTimeout(40, TimeUnit.SECONDS)
-                    .readTimeout(40, TimeUnit.SECONDS)
-                    .writeTimeout(40, TimeUnit.SECONDS);
-            _client = builder.build();
-        }
-        return _client;
+    private static okhttp3.OkHttpClient.Builder newClientBuilder() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(40, TimeUnit.SECONDS)
+                .readTimeout(40, TimeUnit.SECONDS)
+                .writeTimeout(40, TimeUnit.SECONDS);
+        return builder;
     }
 
-    private static SSLContext buildSSlContext(String caContent)  {
+    private static WebSocketClientWrap getDefaultClient() {
+        if(__defaultClient == null) {
+            OkHttpClient client = newClientBuilder().build();
+            __defaultClient = new WebSocketClientWrap(client, true);
+            __defaultClient.retain(); //prevent shutdown by default
+        }
+        return __defaultClient;
+    }
+
+    private static OkHttpClient.Builder configSSL(String caContent, OkHttpClient.Builder builder)  {
         if(caContent == null || caContent.isEmpty()) return null;
         ByteArrayInputStream is = null;
         BufferedInputStream bis = null;
         try {
-            KeyStore ks = KeyStore.getInstance("PKCS12");
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
             ks.load(null, null);
 
             is = new ByteArrayInputStream(caContent.getBytes());
             bis = new BufferedInputStream(is);
 
-            CertificateFactory cff = CertificateFactory.getInstance("X509");
-//            while(bis.available() > 0) {
-//                X509Certificate ce = (X509Certificate)cff.generateCertificate(bis);
-//                String alias = ce.getSubjectX500Principal().getName();
-//                ks.setCertificateEntry(alias, ce);
-//            }
+            CertificateFactory cff;
 
-            Collection<? extends Certificate> certList = cff.generateCertificates(bis);
-            for(Certificate ce: certList) {
-                if(ce instanceof X509Certificate) {
-                    String alias = ((X509Certificate)ce).getSubjectX500Principal().getName();
-                    ks.setCertificateEntry(alias, ce);
-                }else{
-                    Log.e("[Websocket]", "invalidate certificate format " + ce.getClass().getSimpleName());
-                }
+            //use provider "BC" by default
+            try {
+                cff =  CertificateFactory.getInstance("X.509", "BC");
+            } catch (NoSuchProviderException e) {
+                e.printStackTrace();
+                cff =  CertificateFactory.getInstance("X.509");
             }
 
+
+            while(bis.available() > 0) {
+                X509Certificate ce = (X509Certificate)cff.generateCertificate(bis);
+                String alias = ce.getSubjectX500Principal().getName();
+                ks.setCertificateEntry(alias, ce);
+            }
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(ks);
@@ -191,6 +246,8 @@ public class Cocos2dxWebSocket {
             SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(keyManagers, trustManagers, new SecureRandom());
 
+            builder.sslSocketFactory(ctx.getSocketFactory(), (X509TrustManager)trustManagers[0]);
+            return builder;
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (CertificateException e) {
@@ -223,7 +280,7 @@ public class Cocos2dxWebSocket {
     }
 
     public static long connect(String url, String[] protocals, String caContent) {
-        Request.Builder builder = new Request.Builder();
+        Request.Builder requestBuilder = new Request.Builder();
         if(protocals != null && protocals.length > 0) {
             //join string
             StringBuilder buffer = new StringBuilder();
@@ -232,48 +289,66 @@ public class Cocos2dxWebSocket {
                 buffer.append("; ");
             }
             buffer.append(protocals[protocals.length - 1]);
-            builder.addHeader("Sec-WebSocket-Protocol", buffer.toString());
+            requestBuilder.addHeader("Sec-WebSocket-Protocol", buffer.toString());
         }
 
+        OkHttpClient.Builder clientBuilder = null;
+        WebSocketClientWrap clientWrap = null;
 
-        //TODO set self-signed CA
-        SSLContext ctx = buildSSlContext(caContent);
+        if(caContent != null && !caContent.isEmpty()) {
+            if(__secureClientCache.containsKey(caContent) ){
+                clientWrap = __secureClientCache.get(caContent);
+            }else {
+                clientBuilder = newClientBuilder();
+                clientBuilder = configSSL(caContent, clientBuilder);
+                if (clientBuilder != null) {
+                    clientWrap = new WebSocketClientWrap(clientBuilder.build(), false);
+                    __secureClientCache.put(caContent, clientWrap);
+                }
+            }
+        }
 
-        long connectionId = connectionIdGenerator.incrementAndGet();
-        Request request = builder.url(url).build();
+        if(clientWrap == null){
+            clientWrap = getDefaultClient();
+        }
+
+        long connectionId = __connectionIdGenerator.incrementAndGet();
+        Request request = requestBuilder.url(url).build();
         LocalWebSocketListener listener = new LocalWebSocketListener(connectionId);
-        WebSocket socket = getClient().newWebSocket(request, listener);
+        WebSocket socket = clientWrap.getClient().newWebSocket(request, listener);
+        __socketMap.put(connectionId, new WebSocketWrap(socket, clientWrap));
 
-        socketMap.put(connectionId, new WebSocketWrap(socket));
+        clientWrap.retain();
+
         return connectionId;
     }
 
     public static void disconnect(long connectionID, boolean syncClose) {
-        WebSocketWrap socket = socketMap.get(connectionID);
+        WebSocketWrap socket = __socketMap.get(connectionID);
         if(socket != null) {
             socket.close(syncClose);
         }else {
-            Log.e("[WebSocket]", "socket "+connectionID + " not found!");
+            Log.e("[WebSocket]", "_socket "+connectionID + " not found!");
         }
     }
 
     public static void sendBinary(long connectionID, byte[] message)
     {
-        WebSocketWrap socket = socketMap.get(connectionID);
+        WebSocketWrap socket = __socketMap.get(connectionID);
         if(socket != null) {
             socket.send(ByteString.of(message));
         }else {
-            Log.e("[WebSocket]", "socket "+connectionID + " not found!");
+            Log.e("[WebSocket]", "_socket "+connectionID + " not found!");
         }
     }
 
     public static void sendString(long connectionID, String message)
     {
-        WebSocketWrap socket = socketMap.get(connectionID);
+        WebSocketWrap socket = __socketMap.get(connectionID);
         if(socket != null) {
             socket.send(message);
         }else {
-            Log.e("[WebSocket]", "socket "+connectionID + " not found!");
+            Log.e("[WebSocket]", "_socket "+connectionID + " not found!");
         }
     }
 
