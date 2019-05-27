@@ -21,7 +21,6 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.KeyManager;
@@ -41,62 +40,70 @@ import okio.ByteString;
 @SuppressWarnings("unused")
 public class Cocos2dxWebSocket {
 
-    private static WebSocketClientWrap __defaultClient = null;
+    private static final int CONNECT_TIMEOUT = 40;
+    private static final int READ_TIMEOUT = 40;
+    private static final int WRITE_TIMEOUT = 40;
+
+    private static WebSocketClientRC __defaultClient = null;
 
     private static AtomicLong __connectionIdGenerator = new AtomicLong(10000);
 
-    private static Map<Long, WebSocketWrap> __socketMap = new ConcurrentHashMap<>();
+    private static Map<Long, WebSocketAdapter> __socketCache = new ConcurrentHashMap<>();
 
-    private static Map<String, WebSocketClientWrap> __secureClientCache = new ConcurrentHashMap<>();
+    private static Map<String, WebSocketClientRC> __secureClientCache = new ConcurrentHashMap<>();
 
-    private static final class WebSocketClientWrap {
-        WebSocketClientWrap(OkHttpClient client, boolean defaultClient) {
-            this._client = client;
-            this._refCount = new AtomicInteger(0);
+    /**
+     * OkHttpClient adapter with reference counting.
+     * Terminate client when _refCount reach 0
+     */
+    private static final class WebSocketClientRC {
+        WebSocketClientRC(OkHttpClient client, boolean defaultClient) {
+            this._wsClient = client;
+            this._refCount = 0;
             this._isDefaultClient = defaultClient;
         }
 
-        void retain() {
-            this._refCount.incrementAndGet();
+        synchronized void retain() {
+            this._refCount++;
         }
 
-        void release() {
-            if(this._refCount.decrementAndGet() <= 0) {
+        synchronized void release() {
+            if(this._refCount<= 0) {
                 this.shutdown();
             }
         }
 
-        void shutdown() {
-            if(this._client!=null) {
-                this._client.dispatcher().executorService().shutdown();
+        private void shutdown() {
+            if(this._wsClient !=null) {
+                this._wsClient.dispatcher().executorService().shutdown();
                 for(String key : __secureClientCache.keySet()) {
                     if(__secureClientCache.get(key) == this) {
                         __secureClientCache.remove(key);
                     }
                 }
-                this._client = null;
+                this._wsClient = null;
             }
         }
 
-        OkHttpClient getClient() {
-            return _client;
+        OkHttpClient getWSClient() {
+            return _wsClient;
         }
 
-        private OkHttpClient _client;
-        private AtomicInteger _refCount;
+        private OkHttpClient _wsClient;
+        private int _refCount;
         private boolean _isDefaultClient;
     }
 
-    private static final class WebSocketWrap {
+    private static final class WebSocketAdapter {
 
-        WebSocketWrap(WebSocket socket, WebSocketClientWrap client) {
+        WebSocketAdapter(WebSocket socket, WebSocketClientRC client) {
             this._socket = socket;
             this._client = client;
         }
 
         public void close(boolean syncClose)
         {
-            this._closed = true;
+            this._closed = true; //to prevent other callbacks from executing after close
             this._syncClose = syncClose;
             this._socket.close(1000, "manually close by client");
         }
@@ -105,108 +112,123 @@ public class Cocos2dxWebSocket {
             this._socket.send(text);
         }
 
-        public void send(ByteString bs)
+        public void send(ByteString binary)
         {
-            this._socket.send(bs);
+            this._socket.send(binary);
         }
 
         private WebSocket _socket;
         private boolean _syncClose = false;
         private boolean _closed = false;
-        private WebSocketClientWrap _client;
+        private WebSocketClientRC _client;
 
     }
 
-    private static final class LocalWebSocketListener extends WebSocketListener {
+    private static final class WebSocketListenerImpl extends WebSocketListener {
 
         private long _connectionID;
 
-        LocalWebSocketListener(long cid) {
+        WebSocketListenerImpl(long cid) {
             this._connectionID = cid;
         }
 
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
-            WebSocketWrap wrap = __socketMap.get(_connectionID);
-            if(wrap != null && wrap._closed) return;
-            triggerEventDispatch(_connectionID, "open", response.message(), false);
+            WebSocketAdapter socket = __socketCache.get(_connectionID);
+            if(socket != null && socket._closed) return;
+            triggerEventInGLThread(_connectionID, "open", response.message(), false);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {
-            WebSocketWrap wrap = __socketMap.get(_connectionID);
-            if(wrap != null && wrap._closed) return;
+            WebSocketAdapter socket = __socketCache.get(_connectionID);
+            if(socket != null && socket._closed) return;
 
-            triggerEventDispatch(_connectionID, "message", text, false);
+            triggerEventInGLThread(_connectionID, "message", text, false);
         }
 
         @Override
         public void onMessage(WebSocket webSocket, ByteString bytes) {
-            WebSocketWrap wrap = __socketMap.get(_connectionID);
-            if(wrap != null && wrap._closed) return;
-            triggerEventDispatch(_connectionID, "message", bytes.toString(), true);
+            WebSocketAdapter socket = __socketCache.get(_connectionID);
+            if(socket != null && socket._closed) return;
+            triggerEventInGLThread(_connectionID, "message", bytes.toString(), true);
         }
 
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
-            WebSocketWrap wrap = __socketMap.get(_connectionID);
-            if(wrap != null && wrap._closed) return;
-            triggerEventDispatch(_connectionID, "closing", reason, false);
+            WebSocketAdapter socket = __socketCache.get(_connectionID);
+            if(socket != null && socket._closed) return;
+            triggerEventInGLThread(_connectionID, "closing", reason, false);
         }
 
         @Override
         public void onClosed(WebSocket webSocket, int code, String reason) {
-            WebSocketWrap wrap = __socketMap.get(_connectionID);
-            if(wrap != null && wrap._syncClose) {
+            WebSocketAdapter socket = __socketCache.get(_connectionID);
+            if(socket != null && socket._syncClose) {
                 //This procedure DOES NOT run in GL thread, so that this message will not be blocked
                 //in task queue.
-                triggerEvent(_connectionID, "sync-_closed", "", false);
+                triggerEvent(_connectionID, "sync-closed", "", false);
             }else {
-                triggerEventDispatch(_connectionID, "_closed", reason, false);
+                triggerEventInGLThread(_connectionID, "_closed", reason, false);
             }
-            if(wrap != null) {
-                wrap._client.release();
+
+            if(socket != null) {
+                socket._client.release();
             }
-            __socketMap.remove(_connectionID);
+            __socketCache.remove(_connectionID);
         }
 
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            WebSocketWrap wrap = __socketMap.get(_connectionID);
+            WebSocketAdapter socket = __socketCache.get(_connectionID);
 
             if(t instanceof UnknownHostException) {
-                triggerEventDispatch(_connectionID, "error", "CONNECTION_FAILURE", false);
+                triggerEventInGLThread(_connectionID, "error", "CONNECTION_FAILURE", false);
             } else if (t instanceof  SocketTimeoutException) {
-                triggerEventDispatch(_connectionID, "error", "TIME_OUT", false);
+                triggerEventInGLThread(_connectionID, "error", "TIME_OUT", false);
             } else if (t instanceof ConnectException) {
-                triggerEventDispatch(_connectionID, "error", "CONNECTION_FAILURE", false);
+                triggerEventInGLThread(_connectionID, "error", "CONNECTION_FAILURE", false);
             } else {
-                triggerEventDispatch(_connectionID, "error", t.getMessage(), false);
+                triggerEventInGLThread(_connectionID, "error", t.getMessage(), false);
             }
-            if(wrap != null) {
-                wrap._client.release();
+            if(socket != null) {
+                socket._client.release();
             }
-            __socketMap.remove(_connectionID);
+            __socketCache.remove(_connectionID);
         }
     }
 
-    private static okhttp3.OkHttpClient.Builder newClientBuilder() {
+    /**
+     * Setup WebSocket builder with default parameters
+     * @return
+     */
+    private static okhttp3.OkHttpClient.Builder defaultWSClientBuilder() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(40, TimeUnit.SECONDS)
-                .readTimeout(40, TimeUnit.SECONDS)
-                .writeTimeout(40, TimeUnit.SECONDS);
+        builder.connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS);
         return builder;
     }
 
-    private static WebSocketClientWrap getDefaultClient() {
+    /**
+     * Get the default OkHttpClient which will use system SSL context
+     * @return
+     */
+    private static WebSocketClientRC getDefaultClient() {
         if(__defaultClient == null) {
-            OkHttpClient client = newClientBuilder().build();
-            __defaultClient = new WebSocketClientWrap(client, true);
+            OkHttpClient client = defaultWSClientBuilder().build();
+            __defaultClient = new WebSocketClientRC(client, true);
             __defaultClient.retain(); //prevent shutdown by default
         }
         return __defaultClient;
     }
 
+    /**
+     * Setup the SSL context for client builder with provided CA file content
+     * @param caContent
+     * @param builder
+     * @return
+     */
     private static OkHttpClient.Builder configSSL(String caContent, OkHttpClient.Builder builder)  {
         if(caContent == null || caContent.isEmpty()) return null;
         ByteArrayInputStream is = null;
@@ -220,7 +242,8 @@ public class Cocos2dxWebSocket {
 
             CertificateFactory cff;
 
-            //use provider "BC" by default
+            //The default provider may cause parse exception,
+            //choose provider "BC" by default
             try {
                 cff =  CertificateFactory.getInstance("X.509", "BC");
             } catch (NoSuchProviderException e) {
@@ -281,6 +304,8 @@ public class Cocos2dxWebSocket {
 
     public static long connect(String url, String[] protocals, String caContent) {
         Request.Builder requestBuilder = new Request.Builder();
+
+        //add protocol list to header
         if(protocals != null && protocals.length > 0) {
             //join string
             StringBuilder buffer = new StringBuilder();
@@ -293,38 +318,40 @@ public class Cocos2dxWebSocket {
         }
 
         OkHttpClient.Builder clientBuilder = null;
-        WebSocketClientWrap clientWrap = null;
+        WebSocketClientRC client = null;
 
         if(caContent != null && !caContent.isEmpty()) {
+            // use existing WebSocket client if exists
             if(__secureClientCache.containsKey(caContent) ){
-                clientWrap = __secureClientCache.get(caContent);
+                client = __secureClientCache.get(caContent);
             }else {
-                clientBuilder = newClientBuilder();
+                clientBuilder = defaultWSClientBuilder();
                 clientBuilder = configSSL(caContent, clientBuilder);
                 if (clientBuilder != null) {
-                    clientWrap = new WebSocketClientWrap(clientBuilder.build(), false);
-                    __secureClientCache.put(caContent, clientWrap);
+                    client = new WebSocketClientRC(clientBuilder.build(), false);
+                    __secureClientCache.put(caContent, client);
                 }
             }
         }
 
-        if(clientWrap == null){
-            clientWrap = getDefaultClient();
+        if(client == null){
+            client = getDefaultClient();
         }
 
         long connectionId = __connectionIdGenerator.incrementAndGet();
         Request request = requestBuilder.url(url).build();
-        LocalWebSocketListener listener = new LocalWebSocketListener(connectionId);
-        WebSocket socket = clientWrap.getClient().newWebSocket(request, listener);
-        __socketMap.put(connectionId, new WebSocketWrap(socket, clientWrap));
 
-        clientWrap.retain();
+        WebSocketListenerImpl listener = new WebSocketListenerImpl(connectionId);
+        WebSocket wsSocket = client.getWSClient().newWebSocket(request, listener);
+        __socketCache.put(connectionId, new WebSocketAdapter(wsSocket, client));
+
+        client.retain();
 
         return connectionId;
     }
 
     public static void disconnect(long connectionID, boolean syncClose) {
-        WebSocketWrap socket = __socketMap.get(connectionID);
+        WebSocketAdapter socket = __socketCache.get(connectionID);
         if(socket != null) {
             socket.close(syncClose);
         }else {
@@ -334,7 +361,7 @@ public class Cocos2dxWebSocket {
 
     public static void sendBinary(long connectionID, byte[] message)
     {
-        WebSocketWrap socket = __socketMap.get(connectionID);
+        WebSocketAdapter socket = __socketCache.get(connectionID);
         if(socket != null) {
             socket.send(ByteString.of(message));
         }else {
@@ -344,7 +371,7 @@ public class Cocos2dxWebSocket {
 
     public static void sendString(long connectionID, String message)
     {
-        WebSocketWrap socket = __socketMap.get(connectionID);
+        WebSocketAdapter socket = __socketCache.get(connectionID);
         if(socket != null) {
             socket.send(message);
         }else {
@@ -352,7 +379,7 @@ public class Cocos2dxWebSocket {
         }
     }
 
-    private static void triggerEventDispatch(final long connectionID, final String eventName, final String data, final boolean isBinary)
+    private static void triggerEventInGLThread(final long connectionID, final String eventName, final String data, final boolean isBinary)
     {
         ((Cocos2dxActivity)Cocos2dxHelper.getActivity()).runOnGLThread(new Runnable() {
             @Override
