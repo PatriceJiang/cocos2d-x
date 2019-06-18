@@ -33,7 +33,6 @@ if(WINDOWS)
 elseif(ANDROID)
 
     set(COCOS_AUDIO_PLATFORM_HEADER
-        audio/android/PcmAudioService.h
         audio/android/IAudioPlayer.h
         audio/android/AudioDecoder.h
         audio/android/tinysndfile.h
@@ -42,17 +41,17 @@ elseif(ANDROID)
         audio/android/cutils/log.h
         audio/android/ccdandroidUtils.h
         audio/android/AudioDecoderOgg.h
-        audio/android/PcmAudioPlayer.h
         audio/android/audio_utils/include/audio_utils/minifloat.h
         audio/android/audio_utils/include/audio_utils/primitives.h
         audio/android/audio_utils/include/audio_utils/format.h
         audio/android/audio_utils/private/private.h
         audio/android/AudioDecoderWav.h
         audio/android/AudioDecoderMp3.h
-        audio/android/PcmData.h
         audio/android/jni/cddandroidAndroidJavaEngine.h
         audio/android/AudioEngine-inl.h
-
+        audio/android/AudioPlayer.h
+        audio/android/AudioCache.h
+        audio/android/AudioDecoderManager.h
         )
 
     set(COCOS_AUDIO_PLATFORM_SRC
@@ -61,17 +60,17 @@ elseif(ANDROID)
         audio/android/jni/cddandroidAndroidJavaEngine.cpp
         audio/android/AudioEngine-inl.cpp
         audio/android/AudioDecoder.cpp
-        audio/android/AudioDecoderProvider.cpp
         audio/android/AudioDecoderOgg.cpp
         audio/android/AudioDecoderMp3.cpp
         audio/android/AudioDecoderWav.cpp
-        audio/android/PcmAudioPlayer.cpp
-        audio/android/PcmData.cpp
         audio/android/audio_utils/format.c
         audio/android/audio_utils/minifloat.cpp
         audio/android/audio_utils/primitives.c
         audio/android/mp3reader.cpp
         audio/android/tinysndfile.cpp
+        audio/android/AudioPlayer.cpp
+        audio/android/AudioCache.cpp
+        audio/android/AudioDecoderManager.cpp
         )
 
 elseif(LINUX)
