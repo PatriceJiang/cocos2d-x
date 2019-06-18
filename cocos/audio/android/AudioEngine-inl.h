@@ -22,34 +22,27 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
+#include "platform/CCPlatformConfig.h"
+
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 
 #ifndef __AUDIO_ENGINE_INL_H_
 #define __AUDIO_ENGINE_INL_H_
 
-#include <AL/al.h>
-
-#include <string>
 #include <unordered_map>
+
 #include "base/CCRef.h"
-#include "base/ccUtils.h"
-
-#define MAX_AUDIOINSTANCES 24
-
-#define ERRORLOG(msg) log("fun:%s,line:%d,msg:%s",__func__,__LINE__,#msg)
+#include "audio/android/AudioCache.h"
+#include "audio/android/AudioPlayer.h"
 
 NS_CC_BEGIN
 
-class EventCustom;
-class EventListener;
+class Scheduler;
 
 namespace experimental {
+#define MAX_AUDIOINSTANCES 32
 
-class IAudioPlayer;
-class AudioPlayerProvider;
-
-class AudioEngineImpl;
-class AudioEngineImpl : public cocos2d::Ref
+class CC_DLL AudioEngineImpl : public cocos2d::Ref
 {
 public:
     AudioEngineImpl();
@@ -75,14 +68,11 @@ public:
 
 private:
     void _play2d(AudioCache *cache, int audioID);
-    ALuint findValidSource();
-
-    static ALvoid myAlSourceNotificationCallback(ALuint sid, ALuint notificationID, ALvoid* userData);
 
     ALuint _alSources[MAX_AUDIOINSTANCES];
 
     //source,used
-    std::list<ALuint> _unusedSourcesPool;
+    std::unordered_map<ALuint, bool> _alSourceUsed;
 
     //filePath,bufferInfo
     std::unordered_map<std::string, AudioCache> _audioCaches;
@@ -97,8 +87,7 @@ private:
     Scheduler* _scheduler;
 };
 }
-#endif // __AUDIO_ENGINE_INL_H_
- }
 NS_CC_END
-
+#endif // __AUDIO_ENGINE_INL_H_
 #endif
+

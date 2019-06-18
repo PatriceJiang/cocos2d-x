@@ -22,51 +22,96 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-
-#define LOG_TAG "AudioEngine-inl.mm"
+#define LOG_TAG "AudioEngine-Win32"
 
 #include "platform/CCPlatformConfig.h"
 
-#import <OpenAL/alc.h>
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+
+#include "audio/android/AudioEngine-win32.h"
+
+#include "AL/alc.h"
+#include "AL/alext.h"
 
 #include "audio/include/AudioEngine.h"
-#include "platform/CCFileUtils.h"
 #include "base/CCDirector.h"
 #include "base/CCScheduler.h"
-#include "base/ccUtils.h"
+#include "platform/CCFileUtils.h"
+#include "audio/android/AudioDecoderManager.h"
 
+#include <windows.h>
+
+// log, CCLOG aren't threadsafe, since we uses sub threads for parsing pcm data, threadsafe log output
+// is needed. Define the following macros (ALOGV, ALOGD, ALOGI, ALOGW, ALOGE) for threadsafe log output.
+
+//FIXME: Move _winLog, winLog to a separated file
+static void _winLog(const char *format, va_list args)
+{
+    static const int MAX_LOG_LENGTH = 16 * 1024;
+    int bufferSize = MAX_LOG_LENGTH;
+    char* buf = nullptr;
+
+    do
+    {
+        buf = new (std::nothrow) char[bufferSize];
+        if (buf == nullptr)
+            return; // not enough memory
+
+        int ret = vsnprintf(buf, bufferSize - 3, format, args);
+        if (ret < 0)
+        {
+            bufferSize *= 2;
+
+            delete[] buf;
+        }
+        else
+            break;
+
+    } while (true);
+
+    strcat(buf, "\n");
+
+    int pos = 0;
+    int len = strlen(buf);
+    char tempBuf[MAX_LOG_LENGTH + 1] = { 0 };
+    WCHAR wszBuf[MAX_LOG_LENGTH + 1] = { 0 };
+
+    do
+    {
+        std::copy(buf + pos, buf + pos + MAX_LOG_LENGTH, tempBuf);
+
+        tempBuf[MAX_LOG_LENGTH] = 0;
+
+        MultiByteToWideChar(CP_UTF8, 0, tempBuf, -1, wszBuf, sizeof(wszBuf));
+        OutputDebugStringW(wszBuf);
+
+        pos += MAX_LOG_LENGTH;
+
+    } while (pos < len);
+
+    delete[] buf;
+}
+
+void audioLog(const char * format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    _winLog(format, args);
+    va_end(args);
+}
 
 using namespace cocos2d;
 using namespace cocos2d::experimental;
 
-static ALCdevice* s_ALDevice = nullptr;
-static ALCcontext* s_ALContext = nullptr;
-static AudioEngineImpl* s_instance = nullptr;
-
-typedef ALvoid (*alSourceNotificationProc)(ALuint sid, ALuint notificationID, ALvoid* userData);
-typedef ALenum (*alSourceAddNotificationProcPtr)(ALuint sid, ALuint notificationID, alSourceNotificationProc notifyProc, ALvoid* userData);
-static ALenum alSourceAddNotificationExt(ALuint sid, ALuint notificationID, alSourceNotificationProc notifyProc, ALvoid* userData)
-{
-    static alSourceAddNotificationProcPtr proc = nullptr;
-
-    if (proc == nullptr)
-    {
-        proc = (alSourceAddNotificationProcPtr)alcGetProcAddress(nullptr, "alSourceAddNotification");
-    }
-
-    if (proc)
-    {
-        return proc(sid, notificationID, notifyProc, userData);
-    }
-    return AL_INVALID_VALUE;
-}
+static ALCdevice *s_ALDevice = nullptr;
+static ALCcontext *s_ALContext = nullptr;
 
 AudioEngineImpl::AudioEngineImpl()
 : _lazyInitLoop(true)
 , _currentAudioID(0)
 , _scheduler(nullptr)
 {
-    s_instance = this;
+
 }
 
 AudioEngineImpl::~AudioEngineImpl()
@@ -83,22 +128,25 @@ AudioEngineImpl::~AudioEngineImpl()
 
         alcMakeContextCurrent(nullptr);
         alcDestroyContext(s_ALContext);
-    }
-    if (s_ALDevice) {
-        alcCloseDevice(s_ALDevice);
+        s_ALContext = nullptr;
     }
 
-    s_instance = nullptr;
+    if (s_ALDevice) {
+        alcCloseDevice(s_ALDevice);
+        s_ALDevice = nullptr;
+    }
+
+    AudioDecoderManager::destroy();
 }
 
 bool AudioEngineImpl::init()
 {
     bool ret = false;
     do{
-
         s_ALDevice = alcOpenDevice(nullptr);
 
         if (s_ALDevice) {
+            alGetError();
             s_ALContext = alcCreateContext(s_ALDevice, nullptr);
             alcMakeContextCurrent(s_ALContext);
 
@@ -106,17 +154,16 @@ bool AudioEngineImpl::init()
             auto alError = alGetError();
             if(alError != AL_NO_ERROR)
             {
-                ALOGE("%s:generating sources failed! error = %x", __PRETTY_FUNCTION__, alError);
+                ALOGE("%s:generating sources failed! error = %x\n", __FUNCTION__, alError);
                 break;
             }
 
             for (int i = 0; i < MAX_AUDIOINSTANCES; ++i) {
-                _unusedSourcesPool.push_back(_alSources[i]);
-                alSourceAddNotificationExt(_alSources[i], AL_BUFFERS_PROCESSED, myAlSourceNotificationCallback, nullptr);
+                _alSourceUsed[_alSources[i]] = false;
             }
 
             _scheduler = Director::getInstance()->getScheduler();
-            ret = true;
+            ret = AudioDecoderManager::init();
             ALOGI("OpenAL was initialized successfully!");
         }
     }while (false);
@@ -161,9 +208,17 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
         return AudioEngine::INVALID_AUDIO_ID;
     }
 
-    ALuint alSource = findValidSource();
-    if (alSource == AL_INVALID)
-    {
+    bool sourceFlag = false;
+    ALuint alSource = 0;
+    for (int i = 0; i < MAX_AUDIOINSTANCES; ++i) {
+        alSource = _alSources[i];
+
+        if ( !_alSourceUsed[alSource]) {
+            sourceFlag = true;
+            break;
+        }
+    }
+    if(!sourceFlag){
         return AudioEngine::INVALID_AUDIO_ID;
     }
 
@@ -187,6 +242,8 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
     _audioPlayers[_currentAudioID] = player;
     _threadMutex.unlock();
 
+    _alSourceUsed[alSource] = true;
+
     audioCache->addPlayCallback(std::bind(&AudioEngineImpl::_play2d,this,audioCache,_currentAudioID));
 
     if (_lazyInitLoop) {
@@ -199,7 +256,7 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
 
 void AudioEngineImpl::_play2d(AudioCache *cache, int audioID)
 {
-    //Note: It maybe in sub thread or main thread :(
+    //Note: It may bn in sub thread or main thread :(
     if (!*cache->_isDestroyed && cache->_state == AudioCache::State::READY)
     {
         _threadMutex.lock();
@@ -225,18 +282,6 @@ void AudioEngineImpl::_play2d(AudioCache *cache, int audioID)
     }
 }
 
-ALuint AudioEngineImpl::findValidSource()
-{
-    ALuint sourceId = AL_INVALID;
-    if (!_unusedSourcesPool.empty())
-    {
-        sourceId = _unusedSourcesPool.front();
-        _unusedSourcesPool.pop_front();
-    }
-
-    return sourceId;
-}
-
 void AudioEngineImpl::setVolume(int audioID,float volume)
 {
     auto player = _audioPlayers[audioID];
@@ -247,7 +292,7 @@ void AudioEngineImpl::setVolume(int audioID,float volume)
 
         auto error = alGetError();
         if (error != AL_NO_ERROR) {
-            ALOGE("%s: audio id = %d, error = %x", __PRETTY_FUNCTION__,audioID,error);
+            ALOGE("%s: audio id = %d, error = %x", __FUNCTION__,audioID,error);
         }
     }
 }
@@ -268,7 +313,7 @@ void AudioEngineImpl::setLoop(int audioID, bool loop)
 
             auto error = alGetError();
             if (error != AL_NO_ERROR) {
-                ALOGE("%s: audio id = %d, error = %x", __PRETTY_FUNCTION__,audioID,error);
+                ALOGE("%s: audio id = %d, error = %x", __FUNCTION__,audioID,error);
             }
         }
     }
@@ -285,7 +330,7 @@ bool AudioEngineImpl::pause(int audioID)
     auto error = alGetError();
     if (error != AL_NO_ERROR) {
         ret = false;
-        ALOGE("%s: audio id = %d, error = %x", __PRETTY_FUNCTION__,audioID,error);
+        ALOGE("%s: audio id = %d, error = %x\n", __FUNCTION__,audioID,error);
     }
 
     return ret;
@@ -299,7 +344,7 @@ bool AudioEngineImpl::resume(int audioID)
     auto error = alGetError();
     if (error != AL_NO_ERROR) {
         ret = false;
-        ALOGE("%s: audio id = %d, error = %x", __PRETTY_FUNCTION__,audioID,error);
+        ALOGE("%s: audio id = %d, error = %x\n", __FUNCTION__,audioID,error);
     }
 
     return ret;
@@ -309,6 +354,9 @@ void AudioEngineImpl::stop(int audioID)
 {
     auto player = _audioPlayers[audioID];
     player->destroy();
+    //Note: Don't set the flag to false here, it should be set in 'update' function.
+    // Otherwise, the state got from alSourceState may be wrong
+//    _alSourceUsed[player->_alSource] = false;
 
     // Call 'update' method to cleanup immediately since the schedule may be cancelled without any notification.
     update(0.0f);
@@ -320,6 +368,12 @@ void AudioEngineImpl::stopAll()
     {
         player.second->destroy();
     }
+    //Note: Don't set the flag to false here, it should be set in 'update' function.
+    // Otherwise, the state got from alSourceState may be wrong
+//    for(int index = 0; index < MAX_AUDIOINSTANCES; ++index)
+//    {
+//        _alSourceUsed[_alSources[index]] = false;
+//    }
 
     // Call 'update' method to cleanup immediately since the schedule may be cancelled without any notification.
     update(0.0f);
@@ -347,7 +401,7 @@ float AudioEngineImpl::getCurrentTime(int audioID)
 
             auto error = alGetError();
             if (error != AL_NO_ERROR) {
-                ALOGE("%s, audio id:%d,error code:%x", __PRETTY_FUNCTION__,audioID,error);
+                ALOGE("%s, audio id:%d,error code:%x", __FUNCTION__,audioID,error);
             }
         }
     }
@@ -372,7 +426,7 @@ bool AudioEngineImpl::setCurrentTime(int audioID, float time)
         else {
             if (player->_audioCache->_framesRead != player->_audioCache->_totalFrames &&
                 (time * player->_audioCache->_sampleRate) > player->_audioCache->_framesRead) {
-                ALOGE("%s: audio id = %d", __PRETTY_FUNCTION__,audioID);
+                ALOGE("%s: audio id = %d", __FUNCTION__,audioID);
                 break;
             }
 
@@ -380,7 +434,7 @@ bool AudioEngineImpl::setCurrentTime(int audioID, float time)
 
             auto error = alGetError();
             if (error != AL_NO_ERROR) {
-                ALOGE("%s: audio id = %d, error = %x", __PRETTY_FUNCTION__,audioID,error);
+                ALOGE("%s: audio id = %d, error = %x", __FUNCTION__,audioID,error);
             }
             ret = true;
         }
@@ -416,7 +470,7 @@ void AudioEngineImpl::update(float dt)
             it = _audioPlayers.erase(it);
             _threadMutex.unlock();
             delete player;
-            _unusedSourcesPool.push_back(alSource);
+            _alSourceUsed[alSource] = false;
         }
         else if (player->_ready && sourceState == AL_STOPPED) {
 
@@ -428,6 +482,7 @@ void AudioEngineImpl::update(float dt)
             }
 
             AudioEngine::remove(audioID);
+            
             _threadMutex.lock();
             it = _audioPlayers.erase(it);
             _threadMutex.unlock();
@@ -435,9 +490,8 @@ void AudioEngineImpl::update(float dt)
             if (player->_finishCallbak) {
                 player->_finishCallbak(audioID, filePath); //FIXME: callback will delay 50ms
             }
-
             delete player;
-            _unusedSourcesPool.push_back(alSource);
+            _alSourceUsed[alSource] = false;
         }
         else{
             ++it;
