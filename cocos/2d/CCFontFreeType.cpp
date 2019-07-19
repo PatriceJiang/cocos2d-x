@@ -208,7 +208,16 @@ FontFreeType::~FontFreeType()
     }
 }
 
-FontAtlas * FontFreeType::createFontAtlas()
+FontAtlas * FontFreeType::createFontAtlas() {
+    if (_fontAtlas == nullptr)
+    {
+        _fontAtlas = new (std::nothrow) FontAtlas(*this);
+    }
+
+    return _fontAtlas;
+}
+
+FontAtlas * FontFreeType::createFontAtlas(const _ttfConfig &config)
 {
     if (_fontAtlas == nullptr)
     {
@@ -218,7 +227,7 @@ FontAtlas * FontFreeType::createFontAtlas()
             std::u32string utf32;
             if (StringUtils::UTF8ToUTF32(getGlyphCollection(), utf32))
             {
-                _fontAtlas->prepareLetterDefinitions(utf32);
+                _fontAtlas->prepareLetterDefinitions(config, utf32);
             }
         }
 //        this->autorelease();

@@ -43,6 +43,7 @@ class RootTests : public TestList
 public:
     RootTests()
     {
+        addTest("Node: Label - New API", []() {return new NewLabelTests(); });
         addTest("Node: Scene3D", [](){return new (std::nothrow) Scene3DTests(); });
         addTest("ActionManager", [](){return new (std::nothrow) ActionManagerTests(); });
         addTest("Actions - Basic", [](){ return new (std::nothrow) ActionsTests(); });
@@ -84,7 +85,6 @@ public:
         addTest("Node: Camera 3D Test", [](){  return new Camera3DTests(); });
         addTest("Node: Clipping", []() { return new ClippingNodeTests(); });
         addTest("Node: Draw", [](){return new DrawPrimitivesTests(); });
-        addTest("Node: Label - New API", [](){return new NewLabelTests(); });
         addTest("Node: Label - Old API", [](){return new LabelTests(); });
         addTest("Node: Layer", [](){return new LayerTests(); });
         addTest("Node: Light", [](){return new LightTests(); });

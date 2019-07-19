@@ -131,8 +131,8 @@ bool Label::getFontLetterDef(char32_t character, FontLetterDefinition& letterDef
         //   * not normal big width
         character = StringUtils::UnicodeCharacters::Space;
     }
-
-    return _fontAtlas->getLetterDefinitionForChar(character, letterDef);
+    const _ttfConfig *ttfConfig = _currentLabelType == LabelType::TTF ? &getTTFConfig() : nullptr;
+    return _fontAtlas->getLetterDefinitionForChar(ttfConfig, character, letterDef);
 }
 
 void Label::updateBMFontScale()
@@ -341,9 +341,12 @@ bool Label::isHorizontalClamp()
     {
         if (_lettersInfo[ctr].valid)
         {
-            auto& letterDef = _fontAtlas->_letterDefinitions[_lettersInfo[ctr].utf32Char];
+            //auto& letterDef = _fontAtlas->_letterDefinitions[_lettersInfo[ctr].utf32Char];
+            auto* letterDef = _fontAtlas->_letterDefinitions.getForLabel(_lettersInfo[ctr].utf32Char, this);
 
-            auto px = _lettersInfo[ctr].positionX + letterDef.width/2 * _bmfontScale;
+            if (letterDef == nullptr) continue;
+
+            auto px = _lettersInfo[ctr].positionX + letterDef->width/2 * _bmfontScale;
             auto lineIndex = _lettersInfo[ctr].lineIndex;
 
             if(_labelWidth > 0.f){
@@ -417,9 +420,10 @@ void Label::recordLetterInfo(const cocos2d::Vec2& point, char32_t utf32Char, int
         LetterInfo tmpInfo;
         _lettersInfo.push_back(tmpInfo);
     }
+    auto *def = _fontAtlas->_letterDefinitions.getForLabel(utf32Char, this);
     _lettersInfo[letterIndex].lineIndex = lineIndex;
     _lettersInfo[letterIndex].utf32Char = utf32Char;
-    _lettersInfo[letterIndex].valid = _fontAtlas->_letterDefinitions[utf32Char].validDefinition;
+    _lettersInfo[letterIndex].valid = def == nullptr ? false : def->validDefinition;
     _lettersInfo[letterIndex].positionX = point.x;
     _lettersInfo[letterIndex].positionY = point.y;
     _lettersInfo[letterIndex].atlasIndex = -1;

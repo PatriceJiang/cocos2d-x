@@ -49,6 +49,8 @@
 
 NS_CC_BEGIN
 
+struct _ttfConfig;
+
 class CC_DLL FontFreeType : public Font
 {
 public:
@@ -75,7 +77,11 @@ public:
     const char* getFontFamily() const;
     std::string getFontName() const { return _fontName; }
 
+
     virtual FontAtlas* createFontAtlas() override;
+
+    FontAtlas* createFontAtlas(const _ttfConfig &config);
+
     virtual int getFontMaxHeight() const override { return _lineHeight; }
 
     static void releaseFont(const std::string &fontName);

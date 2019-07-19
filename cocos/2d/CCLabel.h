@@ -28,10 +28,11 @@
 #define _COCOS2D_CCLABEL_H_
 
 #include "2d/CCNode.h"
+#include "2d/CCFontAtlas.h"
 #include "renderer/CCCustomCommand.h"
 #include "renderer/CCQuadCommand.h"
-#include "2d/CCFontAtlas.h"
 #include "base/ccTypes.h"
+#include "platform/CCFileUtils.h"
 
 NS_CC_BEGIN
 
@@ -81,12 +82,29 @@ typedef struct _ttfConfig
             distanceFieldEnabled = false;
         }
     }
+
+    size_t getFontHash() const {
+        std::stringstream ss;
+        auto fontFullPath = FileUtils::getInstance()->fullPathForFilename(fontFilePath);
+        ss << fontFullPath << " " << fontSize << " " << outlineSize;
+        return std::hash<std::string>()(ss.str());
+    }
+
+    size_t getCharHash(int32_t character) const {
+        std::stringstream ss;
+        auto fontFullPath = FileUtils::getInstance()->fullPathForFilename(fontFilePath);
+        ss << fontFullPath << " " << fontSize << " " << outlineSize  << " " << character;
+        return std::hash<std::string>()(ss.str());
+    }
+
 } TTFConfig;
 
 class Sprite;
 class SpriteBatchNode;
 class DrawNode;
 class EventListenerCustom;
+class LetterDefinitions;
+class FontAtlas;
 
 /**
  * @brief Label is a subclass of Node that knows how to render text labels.
@@ -793,6 +811,10 @@ protected:
 
 private:
     CC_DISALLOW_COPY_AND_ASSIGN(Label);
+
+
+    friend class LetterDefinitions;
+    friend class FontAtlas;
 };
 
 // end group

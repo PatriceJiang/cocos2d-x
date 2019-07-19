@@ -614,7 +614,7 @@ void Label::setFontAtlas(FontAtlas* atlas,bool distanceFieldEnabled /* = false *
 
     if (_fontAtlas)
     {
-        _lineHeight = _fontAtlas->getLineHeight();
+        _lineHeight = _fontAtlas->getLineHeightForLabel(this);
         _contentDirty = true;
         _systemFontDirty = false;
     }
@@ -775,7 +775,7 @@ void Label::updateLabelLetters()
                 auto& letterInfo = _lettersInfo[letterIndex];
                 if (letterInfo.valid)
                 {
-                    auto& letterDef = _fontAtlas->_letterDefinitions[letterInfo.utf32Char];
+                    auto& letterDef = * _fontAtlas->_letterDefinitions.getForLabel(letterInfo.utf32Char, this);
                     uvRect.size.height = letterDef.height;
                     uvRect.size.width = letterDef.width;
                     uvRect.origin.x = letterDef.U;
@@ -820,7 +820,9 @@ bool Label::alignText()
 
     bool ret = true;
     do {
-        _fontAtlas->prepareLetterDefinitions(_utf32Text);
+        if (_currentLabelType == LabelType::TTF) {
+            _fontAtlas->prepareLetterDefinitions(this->getTTFConfig(), _utf32Text);
+        }
         auto& textures = _fontAtlas->getTextures();
         auto size = textures.size();
         if (size > static_cast<size_t>(_batchNodes.size()))
@@ -927,7 +929,7 @@ bool Label::updateQuads()
     {
         if (_lettersInfo[ctr].valid)
         {
-            auto& letterDef = _fontAtlas->_letterDefinitions[_lettersInfo[ctr].utf32Char];
+            auto& letterDef = * _fontAtlas->_letterDefinitions.getForLabel(_lettersInfo[ctr].utf32Char, this);
             
             _reusedRect.size.height = letterDef.height;
             _reusedRect.size.width  = letterDef.width;
@@ -999,9 +1001,9 @@ bool Label::setTTFConfigInternal(const TTFConfig& ttfConfig)
     }
 
     _currentLabelType = LabelType::TTF;
-    setFontAtlas(newAtlas,ttfConfig.distanceFieldEnabled,true);
-
     _fontConfig = ttfConfig;
+
+    setFontAtlas(newAtlas,ttfConfig.distanceFieldEnabled,true);
 
     if (_fontConfig.outlineSize > 0)
     {
@@ -1784,7 +1786,7 @@ Sprite* Label::getLetter(int letterIndex)
 
             if (letter == nullptr)
             {
-                auto& letterDef = _fontAtlas->_letterDefinitions[letterInfo.utf32Char];
+                auto& letterDef = * _fontAtlas->_letterDefinitions.getForLabel(letterInfo.utf32Char, this);
                 auto textureID = letterDef.textureID;
                 Rect uvRect;
                 uvRect.size.height = letterDef.height;

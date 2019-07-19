@@ -43,6 +43,8 @@ class Texture2D;
 class EventCustom;
 class EventListenerCustom;
 class FontFreeType;
+struct _ttfConfig;
+class Label;
 
 struct FontLetterDefinition
 {
@@ -55,6 +57,38 @@ struct FontLetterDefinition
     int textureID;
     bool validDefinition;
     int xAdvance;
+};
+
+class LetterDefinitions {
+public:
+    void set(char32_t character, const FontLetterDefinition &value);
+    void setTTF(char32_t character, const _ttfConfig &config, const FontLetterDefinition &value);
+    FontLetterDefinition *get(char32_t key);
+    FontLetterDefinition *getTTF(char32_t character, const _ttfConfig &config);
+
+    void clear() 
+    {
+        ttfDict.clear();
+        normalDict.clear();
+    }
+
+    std::unordered_map<size_t, FontLetterDefinition> &getTTFDict() {
+        return ttfDict;
+    }
+
+    std::unordered_map<size_t, FontLetterDefinition> &getNormalDict() {
+        return normalDict;
+    }
+
+    bool empty() const {
+        return ttfDict.empty() && normalDict.empty();
+    }
+
+    FontLetterDefinition *getForLabel(char32_t character, Label *label);
+
+private:
+    std::unordered_map<size_t, FontLetterDefinition> ttfDict;
+    std::unordered_map<size_t, FontLetterDefinition> normalDict;
 };
 
 class CC_DLL FontAtlas : public Ref
@@ -75,13 +109,14 @@ public:
     virtual ~FontAtlas();
     
     void addLetterDefinition(char32_t utf32Char, const FontLetterDefinition &letterDefinition);
-    bool getLetterDefinitionForChar(char32_t utf32Char, FontLetterDefinition &letterDefinition);
+    bool getLetterDefinitionForChar(const _ttfConfig *config, char32_t utf32Char, FontLetterDefinition &letterDefinition);
     
-    bool prepareLetterDefinitions(const std::u32string& utf16String);
+    bool prepareLetterDefinitions(const _ttfConfig &config, const std::u32string& utf16String);
 
     const std::unordered_map<ssize_t, Texture2D*>& getTextures() const { return _atlasTextures; }
     void  addTexture(Texture2D *texture, int slot);
-    float getLineHeight() const { return _lineHeight; }
+    float getLineHeightForLabel(Label *) const;
+    float getLineHeight() const { return _currentLineHeight; }
     void  setLineHeight(float newHeight);
     
     std::string getFontName() const;
@@ -111,6 +146,10 @@ public:
      */
      void setAliasTexParameters();
 
+     void registerFont(const _ttfConfig &config, FontFreeType *font);
+
+     bool hasFont(const _ttfConfig &config);
+
 protected:
     void reset();
     
@@ -118,9 +157,11 @@ protected:
     
     void releaseTextures();
 
-    void findNewCharacters(const std::u32string& u32Text, std::unordered_map<unsigned int, unsigned int>& charCodeMap);
+    void findNewCharacters(const _ttfConfig &config,FontFreeType *fontFreeType, const std::u32string& u32Text, std::unordered_map<unsigned int, unsigned int>& charCodeMap);
 
-    void conversionU32TOGB2312(const std::u32string& u32Text, std::unordered_map<unsigned int, unsigned int>& charCodeMap);
+    void conversionU32TOGB2312(FontFreeType *fontFreeType, const std::u32string& u32Text, std::unordered_map<unsigned int, unsigned int>& charCodeMap);
+
+    //float getMaxOutlineSize 
 
     /**
      * Scale each font letter by scaleFactor.
@@ -130,25 +171,32 @@ protected:
     void scaleFontLetterDefinition(float scaleFactor);
 
     std::unordered_map<ssize_t, Texture2D*> _atlasTextures;
-    std::unordered_map<char32_t, FontLetterDefinition> _letterDefinitions;
-    float _lineHeight;
-    Font* _font;
-    FontFreeType* _fontFreeType;
-    void* _iconv;
+    LetterDefinitions _letterDefinitions;
+    //float _lineHeight;
+    float _currentLineHeight = 0;
+    Font* _font = nullptr;
+    //FontFreeType* _fontFreeType;
+    std::unordered_map<size_t, FontFreeType *> _fontFreeTypeMap;
+
+    bool _hasOutline = false;
+    bool _isTTF = false;
+
+
+    void* _iconv = nullptr;
 
     // Dynamic GlyphCollection related stuff
     int _currentPage;
-    unsigned char *_currentPageData;
+    unsigned char *_currentPageData = nullptr;
     int _currentPageDataSize;
     float _currentPageOrigX;
     float _currentPageOrigY;
     int _letterPadding;
     int _letterEdgeExtend;
 
-    int _fontAscender;
-    EventListenerCustom* _rendererRecreatedListener;
-    bool _antialiasEnabled;
-    int _currLineHeight;
+    int _fontAscender = 0;
+    EventListenerCustom* _rendererRecreatedListener = nullptr;
+    bool _antialiasEnabled = true;
+    int _currLineHeight = 0;
 
     friend class Label;
 };

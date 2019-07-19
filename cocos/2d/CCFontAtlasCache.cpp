@@ -51,6 +51,30 @@ void FontAtlasCache::purgeCachedData()
     _atlasMap.clear();
 }
 
+std::string FontAtlasCache::getFontCacheKey(const _ttfConfig &config)
+{
+    std::stringstream ss; 
+    ss << "TTF";
+    if (config.fontSize < 16) 
+    {
+        ss << " small";    
+    }
+    else if (config.fontSize < 32) 
+    {
+        ss << " medium";
+    }
+    else 
+    {
+        ss << " large";
+    }
+
+    if (config.outlineSize > 0) {
+        ss << " outline ";
+    }
+
+    return ss.str();
+}
+
 FontAtlas* FontAtlasCache::getFontAtlasTTF(const _ttfConfig* config)
 {
     auto realFontFilename = FileUtils::getInstance()->getNewFilename(config->fontFilePath);  // resolves real file path, to prevent storing multiple atlases for the same file.
@@ -60,32 +84,47 @@ FontAtlas* FontAtlasCache::getFontAtlasTTF(const _ttfConfig* config)
         useDistanceField = false;
     }
 
+    /*
     std::string key;
     char keyPrefix[ATLAS_MAP_KEY_PREFIX_BUFFER_SIZE];
     snprintf(keyPrefix, ATLAS_MAP_KEY_PREFIX_BUFFER_SIZE, useDistanceField ? "df %.2f %d " : "%.2f %d ", config->fontSize, config->outlineSize);
     std::string atlasName(keyPrefix);
     atlasName += realFontFilename;
+    */
+    auto atlasName = getFontCacheKey(*config);
+
 
     auto it = _atlasMap.find(atlasName);
+    
+    FontAtlas * fontAtlas = nullptr;
 
     if ( it == _atlasMap.end() )
     {
-        auto font = FontFreeType::create(realFontFilename, config->fontSize, config->glyphs,
+        auto *fontFreeType = FontFreeType::create(realFontFilename, config->fontSize, config->glyphs,
             config->customGlyphs, useDistanceField, config->outlineSize);
-        if (font)
+        if (fontFreeType)
         {
-            auto tempAtlas = font->createFontAtlas();
-            if (tempAtlas)
+            fontAtlas = fontFreeType->createFontAtlas(*config);
+            if (fontAtlas)
             {
-                _atlasMap[atlasName] = tempAtlas;
+                fontAtlas->registerFont(*config, fontFreeType);
+                _atlasMap[atlasName] = fontAtlas;
                 return _atlasMap[atlasName];
             }
         }
     }
-    else
-        return it->second;
+    else{
+        fontAtlas = it->second;
+        if (!fontAtlas->hasFont(*config)) {
+            auto *fontFreeType = FontFreeType::create(realFontFilename, config->fontSize, config->glyphs,
+                config->customGlyphs, useDistanceField, config->outlineSize);
+            if (fontFreeType) {
+                fontAtlas->registerFont(*config, fontFreeType);
+            }
+        }
+    }
 
-    return nullptr;
+    return fontAtlas;
 }
 
 FontAtlas* FontAtlasCache::getFontAtlasFNT(const std::string& fontFileName, const Vec2& imageOffset /* = Vec2::ZERO */)

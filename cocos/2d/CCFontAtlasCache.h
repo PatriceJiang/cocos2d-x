@@ -69,6 +69,8 @@ public:
 
 private:
     static std::unordered_map<std::string, FontAtlas *> _atlasMap;
+
+    static std::string getFontCacheKey(const _ttfConfig &config);
 };
 
 NS_CC_END
