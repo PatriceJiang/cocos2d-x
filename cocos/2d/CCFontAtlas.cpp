@@ -392,6 +392,7 @@ bool FontAtlas::prepareLetterDefinitions(const _ttfConfig &config, const std::u3
 
     auto *fontFreeType = _fontFreeTypeMap[config.getFontHash()];
 
+    CCASSERT(_hasOutline == config.outlineSize > 0, "should not alter outline attribuet");
  
     if (!_currentPageData)
         reinit();     

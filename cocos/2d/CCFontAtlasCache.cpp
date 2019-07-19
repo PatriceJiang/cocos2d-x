@@ -51,7 +51,7 @@ void FontAtlasCache::purgeCachedData()
     _atlasMap.clear();
 }
 
-std::string FontAtlasCache::getFontCacheKey(const _ttfConfig &config)
+std::string FontAtlasCache::getFontCacheKey(const _ttfConfig &config, bool useDistanceField)
 {
     std::stringstream ss; 
     ss << "TTF";
@@ -59,7 +59,7 @@ std::string FontAtlasCache::getFontCacheKey(const _ttfConfig &config)
     {
         ss << " small";    
     }
-    else if (config.fontSize < 32) 
+    else if (config.fontSize <= 32) 
     {
         ss << " medium";
     }
@@ -68,8 +68,10 @@ std::string FontAtlasCache::getFontCacheKey(const _ttfConfig &config)
         ss << " large";
     }
 
-    if (config.outlineSize > 0) {
-        ss << " outline ";
+    ss << " " << config.outlineSize;
+
+    if (useDistanceField) {
+        ss << " df";
     }
 
     return ss.str();
@@ -91,7 +93,7 @@ FontAtlas* FontAtlasCache::getFontAtlasTTF(const _ttfConfig* config)
     std::string atlasName(keyPrefix);
     atlasName += realFontFilename;
     */
-    auto atlasName = getFontCacheKey(*config);
+    auto atlasName = getFontCacheKey(*config, useDistanceField);
 
 
     auto it = _atlasMap.find(atlasName);
