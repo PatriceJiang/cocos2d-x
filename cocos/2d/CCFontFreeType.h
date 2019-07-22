@@ -84,6 +84,8 @@ public:
 
     virtual int getFontMaxHeight() const override { return _lineHeight; }
 
+    int getFontMaxAdvance() const { return _maxAdvance; }
+
     static void releaseFont(const std::string &fontName);
 
 private:
@@ -114,6 +116,7 @@ private:
     bool _distanceFieldEnabled;
     float _outlineSize;
     int _lineHeight;
+    int _maxAdvance = 0;
     FontAtlas* _fontAtlas;
 
     GlyphCollection _usedGlyphs;
