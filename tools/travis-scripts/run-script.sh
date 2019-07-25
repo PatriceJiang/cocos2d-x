@@ -149,7 +149,7 @@ function generate_pull_request_for_binding_codes_and_cocosfiles()
     local ELAPSEDSECS=`date +%s`
     local COCOS_BRANCH="update_lua_bindings_$ELAPSEDSECS"
     local COMMITTAG="[ci skip][AUTO]: updating luabinding & cocos_file.json automatically"
-    local PULL_REQUEST_REPO="https://api.github.com/repos/cocos2d/cocos2d-x/pulls"
+    local PULL_REQUEST_REPO="https://api.github.com/repos/PatriceJiang/cocos2d-x/pulls"
 
     pushd "$COCOS2DX_ROOT"
     #Set git user for cocos2d-lua repo
@@ -186,8 +186,11 @@ function generate_pull_request_for_binding_codes_and_cocosfiles()
     git checkout -b "$COCOS_BRANCH"
     git commit -m "$COMMITTAG"
 
+    set -x
     echo "Pushing to Robot's repo ..."
+    git fetch --unshallow origin
     git push -fq upstream "$COCOS_BRANCH" 2> /dev/null
+    set +x
 
     echo "Sending Pull Request to base repo ..."
     curl --user "${GH_USER}:${GH_PASSWORD}" --request POST --data "{ \"title\": \"$COMMITTAG\", \"body\": \"\", \"head\": \"${GH_USER}:${COCOS_BRANCH}\", \"base\": \"${TRAVIS_BRANCH}\"}" "${PULL_REQUEST_REPO}" 2> /dev/null > /dev/null
