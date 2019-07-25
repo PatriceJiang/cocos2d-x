@@ -154,6 +154,7 @@ function generate_pull_request_for_binding_codes_and_cocosfiles()
     # Don't exit on non-zero return value
     set +e
 
+
     pushd "$COCOS2DX_ROOT"
     #Set git user for cocos2d-lua repo
     git config user.email ${GH_EMAIL}
@@ -283,6 +284,10 @@ function run_after_merge()
     genernate_binding_codes
     generate_pull_request_for_binding_codes_and_cocosfiles
 }
+
+echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
+echo "TRAVIS_OS_NAME: ${TRAVIS_OS_NAME}"
+echo "GEN_BINDING_AND_COCOSFILE: ${GEN_BINDING_AND_COCOSFILE}"
 
 # build pull request
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
