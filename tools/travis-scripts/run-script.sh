@@ -34,8 +34,8 @@ function build_linux()
     cd $COCOS2DX_ROOT
     mkdir -p linux-build
     cd linux-build
-    cmake ..
-    cmake --build .
+    cmake .. -G "Unix Makefiles"
+    cmake --build . -- -j 4
 }
 
 function build_mac_cmake()
