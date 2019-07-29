@@ -26,24 +26,24 @@
  ****************************************************************************/
 
 var TextureCacheTestBase = BaseTestLayer.extend({
-    _title:"",
-    _subtitle:"",
+    _title: "",
+    _subtitle: "",
 
-    ctor:function() {
-        this._super(cc.color(0,0,0,255), cc.color(98,99,117,255));
+    ctor: function () {
+        this._super(cc.color(0, 0, 0, 255), cc.color(98, 99, 117, 255));
     },
 
-    onRestartCallback:function (sender) {
+    onRestartCallback: function (sender) {
         var s = new TexCacheTestScene();
         s.addChild(restartTexCacheTest());
         director.runScene(s);
     },
-    onNextCallback:function (sender) {
+    onNextCallback: function (sender) {
         var s = new TexCacheTestScene();
         s.addChild(nextTexCacheTest());
         director.runScene(s);
     },
-    onBackCallback:function (sender) {
+    onBackCallback: function (sender) {
         var s = new TexCacheTestScene();
         s.addChild(previousTexCacheTest());
         director.runScene(s);
@@ -52,12 +52,12 @@ var TextureCacheTestBase = BaseTestLayer.extend({
 
 var TextureLoadImgTest = TextureCacheTestBase.extend({
     _title: "Load Same Image Twice",
-    _labelFirst:null,
-    _labelSecond:null,
+    _labelFirst: null,
+    _labelSecond: null,
     ctor: function () {
         this._super();
 
-        if('opengl' in cc.sys.capabilities && !cc.sys.isNative){
+        if ('opengl' in cc.sys.capabilities && !cc.sys.isNative) {
             var label = new cc.LabelTTF("Not support Loading texture from remote site on HTML5-WebGL", "Times New Roman", 28);
             label.x = winSize.width / 2;
             label.y = winSize.height / 2;
@@ -67,16 +67,16 @@ var TextureLoadImgTest = TextureCacheTestBase.extend({
 
         this._labelFirst = new cc.LabelTTF("load first image");
         this._labelFirst.attr({
-            x:cc.winSize.width/2,
-            y:cc.winSize.height/2 + 30
+            x: cc.winSize.width / 2,
+            y: cc.winSize.height / 2 + 30
         });
         this.addChild(this._labelFirst, 1);
 
 
         this._labelSecond = new cc.LabelTTF("load second image");
         this._labelSecond.attr({
-            x:cc.winSize.width/2,
-            y:cc.winSize.height/2 - 30
+            x: cc.winSize.width / 2,
+            y: cc.winSize.height / 2 - 30
         });
         this.addChild(this._labelSecond, 1);
 
@@ -85,9 +85,8 @@ var TextureLoadImgTest = TextureCacheTestBase.extend({
         cc.textureCache.addImageAsync(url, this.texSecondLoaded, this);
     },
 
-    texFirstLoaded: function(texture) {
-        if (!texture)
-        {
+    texFirstLoaded: function (texture) {
+        if (!texture) {
             this._labelFirst.setString("texFirstLoaded fail");
             return;
         }
@@ -96,17 +95,16 @@ var TextureLoadImgTest = TextureCacheTestBase.extend({
             this.removeChild(this.sprite);
         }
         this.sprite = new cc.Sprite(texture);
-        this.sprite.x = cc.winSize.width/2;
-        this.sprite.y = cc.winSize.height/2;
+        this.sprite.x = cc.winSize.width / 2;
+        this.sprite.y = cc.winSize.height / 2;
         this.addChild(this.sprite);
 
         this._labelFirst.setString("texFirstLoaded successful");
     },
 
-    texSecondLoaded: function(texture) {
+    texSecondLoaded: function (texture) {
 
-        if (!texture)
-        {
+        if (!texture) {
             this._labelSecond.setString("texSecondLoaded fail");
             return;
         }
@@ -115,8 +113,8 @@ var TextureLoadImgTest = TextureCacheTestBase.extend({
             this.removeChild(this.sprite2);
         }
         this.sprite2 = new cc.Sprite(texture);
-        this.sprite2.x = cc.winSize.width/2;
-        this.sprite2.y = cc.winSize.height/2 + 70;
+        this.sprite2.x = cc.winSize.width / 2;
+        this.sprite2.y = cc.winSize.height / 2 + 70;
         this.addChild(this.sprite2);
 
         this._labelSecond.setString("texSecondLoaded successful");
@@ -124,12 +122,12 @@ var TextureLoadImgTest = TextureCacheTestBase.extend({
 });
 
 var TextureCacheTest = TextureCacheTestBase.extend({
-    _title:"Texture Cache Loading Test",
-    _labelLoading:null,
-    _labelPercent:null,
-    _numberOfSprites:20,
-    _numberOfLoadedSprites:0,
-    ctor:function () {
+    _title: "Texture Cache Loading Test",
+    _labelLoading: null,
+    _labelPercent: null,
+    _numberOfSprites: 20,
+    _numberOfLoadedSprites: 0,
+    ctor: function () {
         this._super();
 
         var size = cc.director.getWinSize();
@@ -168,8 +166,46 @@ var TextureCacheTest = TextureCacheTestBase.extend({
         texCache.addImageAsync("Images/background2.png", this.loadingCallBack, this);
         texCache.addImageAsync("Images/background3.png", this.loadingCallBack, this);
         texCache.addImageAsync("Images/blocks.png", this.loadingCallBack, this);
+
+        // for(let i =0 ; i < 1000; i++) {
+        //     let name = ("000" + i).slice(-3);
+        //     texCache.addImageAsync("Images/noise_"+name+".png", this.loadingCallBack, this);
+        // }
+        
+        //bench memory
+        //10G = 1024 * 1024 * 1024 * 10
+
+        let Max = 1024 * 1024 * 1024 * 100;
+
+        let alloc = function(n) {
+            let buffer =  new ArrayBuffer(n);
+            let view = new Int8Array(buffer);
+            for(let i=0;i<n;i++) {
+                view[i] = 0;
+            }
+            return buffer;
+        };
+        let defer = function(fn) { setTimeout(fn, 3);}
+
+        let Unit = 1024 * 1024 * 1; // 1M
+        let iterate = Max / Unit;
+
+        let array = [];
+
+        let fullTest = function(iterate) {
+            if(iterate <=0) {
+                return;
+            }
+            console.log("allocate remain "+ iterate +", allocated " + array.length);
+            //array.push(alloc(Unit));
+            alloc(Unit);
+            defer(function(){
+                fullTest(iterate - 1);
+            });
+        };
+        fullTest(iterate);
     },
-    addSprite:function () {
+    addSprite: function () {
         var size = cc.director.getWinSize();
 
         // create sprites
@@ -251,24 +287,27 @@ var TextureCacheTest = TextureCacheTestBase.extend({
         this.addChild(s14);
         this.addChild(s15);
     },
-    loadingCallBack:function (obj) {
+    loadingCallBack: function (obj) {
+        console.log("number of loaded sprites " + this._numberOfLoadedSprites);
+        console.log(JSON.stringify(obj));
         ++this._numberOfLoadedSprites;
-        this._labelPercent.setString((this._numberOfLoadedSprites / this._numberOfSprites) * 100 + '');
         if (this._numberOfLoadedSprites == this._numberOfSprites) {
             this.removeChild(this._labelLoading, true);
             this.removeChild(this._labelPercent, true);
             this.addSprite();
         }
+        this._labelPercent.setString((this._numberOfLoadedSprites / this._numberOfSprites) * 100 + '');
+       
     }
 });
 
 var RemoteTextureTest = TextureCacheTestBase.extend({
-    _title:"Remote Texture Test",
-    _subtitle:"",
+    _title: "Remote Texture Test",
+    _subtitle: "",
     _remoteTex: "http://www.cocos2d-x.org/images/logo.png",
-    onEnter:function () {
+    onEnter: function () {
         this._super();
-        if('opengl' in cc.sys.capabilities && !cc.sys.isNative){
+        if ('opengl' in cc.sys.capabilities && !cc.sys.isNative) {
             var label = new cc.LabelTTF("Not support Loading texture from remote site on HTML5-WebGL", "Times New Roman", 28);
             label.x = winSize.width / 2;
             label.y = winSize.height / 2;
@@ -277,7 +316,7 @@ var RemoteTextureTest = TextureCacheTestBase.extend({
             this.scheduleOnce(this.startDownload, 0.1);
     },
 
-    startDownload: function() {
+    startDownload: function () {
         var imageUrlArray = ["http://www.cocos2d-x.org/s/upload/v35.jpg", "http://www.cocos2d-x.org/s/upload/testin.jpg", "http://www.cocos2d-x.org/s/upload/geometry_dash.jpg", "http://www.cocos2d-x.org/images/logo.png"];
 
         for (var i = 0; i < imageUrlArray.length; i++) {
@@ -287,13 +326,13 @@ var RemoteTextureTest = TextureCacheTestBase.extend({
         cc.loader.loadImg("http://www.cocos2d-x.org/no_such_file.jpg", this.failLoaded.bind(this));
     },
 
-    texLoaded: function(texture) {
+    texLoaded: function (texture) {
         if (texture instanceof cc.Texture2D) {
             cc.log("Remote texture loaded");
-            
+
             var sprite = new cc.Sprite(texture);
-            sprite.x = cc.winSize.width/2;
-            sprite.y = cc.winSize.height/2;
+            sprite.x = cc.winSize.width / 2;
+            sprite.y = cc.winSize.height / 2;
             this.addChild(sprite);
         }
         else {
@@ -325,7 +364,7 @@ var RemoteTextureTest = TextureCacheTestBase.extend({
 var texCacheTestSceneIdx = -1;
 
 var TexCacheTestScene = TestScene.extend({
-    runThisTest:function (num) {
+    runThisTest: function (num) {
         texCacheTestSceneIdx = (num || num == 0) ? (num - 1) : -1;
         var layer = nextTexCacheTest();
         this.addChild(layer);
