@@ -1,1659 +1,1300 @@
 #include "scripting/js-bindings/auto/jsb_cocos2dx_builder_auto.hpp"
-#include "scripting/js-bindings/manual/cocos2d_specifics.hpp"
+#include "scripting/js-bindings/manual/jsb_conversions.hpp"
+#include "scripting/js-bindings/manual/jsb_global.h"
 #include "editor-support/cocosbuilder/CocosBuilder.h"
 
-template<class T>
-static bool dummy_constructor(JSContext *cx, uint32_t argc, jsval *vp)
-{
-    JS_ReportError(cx, "Constructor for the requested class is not available, please refer to the API reference.");
-    return false;
-}
+se::Object* __jsb_cocosbuilder_CCBAnimationManager_proto = nullptr;
+se::Class* __jsb_cocosbuilder_CCBAnimationManager_class = nullptr;
 
-static bool empty_constructor(JSContext *cx, uint32_t argc, jsval *vp) {
-    return false;
-}
-
-static bool js_is_native_obj(JSContext *cx, uint32_t argc, jsval *vp)
+static bool js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    args.rval().setBoolean(true);
-    return true;
-}
-JSClass  *jsb_cocosbuilder_CCBAnimationManager_class;
-JSObject *jsb_cocosbuilder_CCBAnimationManager_prototype;
-
-bool js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode(JSContext *cx, uint32_t argc, jsval *vp)
-{
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 2) {
         cocos2d::Node* arg0 = nullptr;
         cocos2d::Node* arg1 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        do {
-            if (args.get(1).isNull()) { arg1 = nullptr; break; }
-            if (!args.get(1).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(1).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg1 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg1, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        ok &= seval_to_native_ptr(args[1], &arg1);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode : Error processing arguments");
         cobj->moveAnimationsFromNode(arg0, arg1);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode : wrong number of arguments: %d, was expecting %d", argc, 2);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         int arg0 = 0;
-        ok &= jsval_to_int32(cx, args.get(0), (int32_t *)&arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId : Error processing arguments");
+        do { int32_t tmp = 0; ok &= seval_to_int32(args[0], &tmp); arg0 = (int)tmp; } while(false);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId : Error processing arguments");
         cobj->setAutoPlaySequenceId(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::ValueVector& ret = cobj->getDocumentCallbackNames();
-        JS::RootedValue jsret(cx);
-        jsret = ccvaluevector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::ValueVector& result = cobj->getDocumentCallbackNames();
+        ok &= ccvaluevector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocosbuilder::CCBSequenceProperty* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocosbuilder::CCBSequenceProperty*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel : Error processing arguments");
-        cocos2d::Sequence* ret = cobj->actionForSoundChannel(arg0);
-        JS::RootedValue jsret(cx);
-        if (ret) {
-            jsret = OBJECT_TO_JSVAL(js_get_or_create_jsobject<cocos2d::Sequence>(cx, (cocos2d::Sequence*)ret));
-        } else {
-            jsret = JSVAL_NULL;
-        };
-        args.rval().set(jsret);
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel : Error processing arguments");
+        cocos2d::Sequence* result = cobj->actionForSoundChannel(arg0);
+        ok &= native_ptr_to_seval<cocos2d::Sequence>((cocos2d::Sequence*)result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setBaseValue(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setBaseValue(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setBaseValue : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setBaseValue : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 3) {
         cocos2d::Value arg0;
         cocos2d::Node* arg1 = nullptr;
         std::string arg2;
-        ok &= jsval_to_ccvalue(cx, args.get(0), &arg0);
-        do {
-            if (args.get(1).isNull()) { arg1 = nullptr; break; }
-            if (!args.get(1).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(1).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg1 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg1, cx, false, "Invalid Native Object");
-        } while (0);
-        ok &= jsval_to_std_string(cx, args.get(2), &arg2);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setBaseValue : Error processing arguments");
+        ok &= seval_to_ccvalue(args[0], &arg0);
+        ok &= seval_to_native_ptr(args[1], &arg1);
+        ok &= seval_to_std_string(args[2], &arg2);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setBaseValue : Error processing arguments");
         cobj->setBaseValue(arg0, arg1, arg2);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setBaseValue : wrong number of arguments: %d, was expecting %d", argc, 3);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 3);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setBaseValue)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::Vector<cocos2d::Node *>& ret = cobj->getDocumentOutletNodes();
-        JS::RootedValue jsret(cx);
-        jsret = ccvector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::Vector<cocos2d::Node *>& result = cobj->getDocumentOutletNodes();
+        ok &= Vector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        std::string ret = cobj->getLastCompletedSequenceName();
-        JS::RootedValue jsret(cx);
-        jsret = std_string_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        std::string result = cobj->getLastCompletedSequenceName();
+        ok &= std_string_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setRootNode(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setRootNode(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setRootNode : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setRootNode : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::Node* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setRootNode : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setRootNode : Error processing arguments");
         cobj->setRootNode(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setRootNode : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setRootNode)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 2) {
         const char* arg0 = nullptr;
-        double arg1 = 0;
-        std::string arg0_tmp; ok &= jsval_to_std_string(cx, args.get(0), &arg0_tmp); arg0 = arg0_tmp.c_str();
-        ok &= JS::ToNumber( cx, args.get(1), &arg1) && !std::isnan(arg1);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration : Error processing arguments");
+        float arg1 = 0;
+        std::string arg0_tmp; ok &= seval_to_std_string(args[0], &arg0_tmp); arg0 = arg0_tmp.c_str();
+        ok &= seval_to_float(args[1], &arg1);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration : Error processing arguments");
         cobj->runAnimationsForSequenceNamedTweenDuration(arg0, arg1);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration : wrong number of arguments: %d, was expecting %d", argc, 2);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         std::string arg0;
-        ok &= jsval_to_std_string(cx, args.get(0), &arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName : Error processing arguments");
+        ok &= seval_to_std_string(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName : Error processing arguments");
         cobj->addDocumentOutletName(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        const cocos2d::Size& ret = cobj->getRootContainerSize();
-        JS::RootedValue jsret(cx);
-        jsret = ccsize_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        const cocos2d::Size& result = cobj->getRootContainerSize();
+        ok &= Size_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         std::string arg0;
-        ok &= jsval_to_std_string(cx, args.get(0), &arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName : Error processing arguments");
+        ok &= seval_to_std_string(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName : Error processing arguments");
         cobj->setDocumentControllerName(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setObject(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setObject(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setObject : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setObject : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 3) {
         cocos2d::Ref* arg0 = nullptr;
         cocos2d::Node* arg1 = nullptr;
         std::string arg2;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::Ref*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        do {
-            if (args.get(1).isNull()) { arg1 = nullptr; break; }
-            if (!args.get(1).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(1).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg1 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg1, cx, false, "Invalid Native Object");
-        } while (0);
-        ok &= jsval_to_std_string(cx, args.get(2), &arg2);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setObject : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        ok &= seval_to_native_ptr(args[1], &arg1);
+        ok &= seval_to_std_string(args[2], &arg2);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setObject : Error processing arguments");
         cobj->setObject(arg0, arg1, arg2);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setObject : wrong number of arguments: %d, was expecting %d", argc, 3);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 3);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getContainerSize(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setObject)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getContainerSize(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getContainerSize : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getContainerSize : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::Node* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getContainerSize : Error processing arguments");
-        const cocos2d::Size& ret = cobj->getContainerSize(arg0);
-        JS::RootedValue jsret(cx);
-        jsret = ccsize_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getContainerSize : Error processing arguments");
+        const cocos2d::Size& result = cobj->getContainerSize(arg0);
+        ok &= Size_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getContainerSize : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getContainerSize : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getContainerSize)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocosbuilder::CCBSequenceProperty* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocosbuilder::CCBSequenceProperty*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel : Error processing arguments");
-        cocos2d::Sequence* ret = cobj->actionForCallbackChannel(arg0);
-        JS::RootedValue jsret(cx);
-        if (ret) {
-            jsret = OBJECT_TO_JSVAL(js_get_or_create_jsobject<cocos2d::Sequence>(cx, (cocos2d::Sequence*)ret));
-        } else {
-            jsret = JSVAL_NULL;
-        };
-        args.rval().set(jsret);
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel : Error processing arguments");
+        cocos2d::Sequence* result = cobj->actionForCallbackChannel(arg0);
+        ok &= native_ptr_to_seval<cocos2d::Sequence>((cocos2d::Sequence*)result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::ValueVector& ret = cobj->getDocumentOutletNames();
-        JS::RootedValue jsret(cx);
-        jsret = ccvaluevector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::ValueVector& result = cobj->getDocumentOutletNames();
+        ok &= ccvaluevector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::extension::Control::EventType arg0;
-        ok &= jsval_to_int32(cx, args.get(0), (int32_t *)&arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents : Error processing arguments");
+        do { int32_t tmp = 0; ok &= seval_to_int32(args[0], &tmp); arg0 = (cocos2d::extension::Control::EventType)tmp; } while(false);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents : Error processing arguments");
         cobj->addDocumentCallbackControlEvents(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_init(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_init(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_init : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_init : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        bool ret = cobj->init();
-        JS::RootedValue jsret(cx);
-        jsret = BOOLEAN_TO_JSVAL(ret);
-        args.rval().set(jsret);
+        bool result = cobj->init();
+        ok &= boolean_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_init : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_init : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_init)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::ValueVector& ret = cobj->getKeyframeCallbacks();
-        JS::RootedValue jsret(cx);
-        jsret = ccvaluevector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::ValueVector& result = cobj->getKeyframeCallbacks();
+        ok &= ccvaluevector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::ValueVector& ret = cobj->getDocumentCallbackControlEvents();
-        JS::RootedValue jsret(cx);
-        jsret = ccvaluevector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::ValueVector& result = cobj->getDocumentCallbackControlEvents();
+        ok &= ccvaluevector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::Size arg0;
-        ok &= jsval_to_ccsize(cx, args.get(0), &arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize : Error processing arguments");
+        ok &= seval_to_Size(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize : Error processing arguments");
         cobj->setRootContainerSize(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 2) {
         int arg0 = 0;
-        double arg1 = 0;
-        ok &= jsval_to_int32(cx, args.get(0), (int32_t *)&arg0);
-        ok &= JS::ToNumber( cx, args.get(1), &arg1) && !std::isnan(arg1);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration : Error processing arguments");
+        float arg1 = 0;
+        do { int32_t tmp = 0; ok &= seval_to_int32(args[0], &tmp); arg0 = (int)tmp; } while(false);
+        ok &= seval_to_float(args[1], &arg1);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration : Error processing arguments");
         cobj->runAnimationsForSequenceIdTweenDuration(arg0, arg1);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration : wrong number of arguments: %d, was expecting %d", argc, 2);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        const char* ret = cobj->getRunningSequenceName();
-        JS::RootedValue jsret(cx);
-        jsret = c_string_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        const char* result = cobj->getRunningSequenceName();
+        ok &= std_string_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        int ret = cobj->getAutoPlaySequenceId();
-        JS::RootedValue jsret(cx);
-        jsret = int32_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        int result = cobj->getAutoPlaySequenceId();
+        ok &= int32_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         std::string arg0;
-        ok &= jsval_to_std_string(cx, args.get(0), &arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName : Error processing arguments");
+        ok &= seval_to_std_string(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName : Error processing arguments");
         cobj->addDocumentCallbackName(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getRootNode(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getRootNode(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getRootNode : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getRootNode : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::Node* ret = cobj->getRootNode();
-        JS::RootedValue jsret(cx);
-        if (ret) {
-            jsret = OBJECT_TO_JSVAL(js_get_or_create_jsobject<cocos2d::Node>(cx, (cocos2d::Node*)ret));
-        } else {
-            jsret = JSVAL_NULL;
-        };
-        args.rval().set(jsret);
+        cocos2d::Node* result = cobj->getRootNode();
+        ok &= native_ptr_to_seval<cocos2d::Node>((cocos2d::Node*)result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getRootNode : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getRootNode : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getRootNode)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::Node* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode : Error processing arguments");
         cobj->addDocumentOutletNode(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setDelegate(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setDelegate(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setDelegate : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setDelegate : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocosbuilder::CCBAnimationManagerDelegate* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocosbuilder::CCBAnimationManagerDelegate*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setDelegate : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setDelegate : Error processing arguments");
         cobj->setDelegate(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setDelegate : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setDelegate)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         const char* arg0 = nullptr;
-        std::string arg0_tmp; ok &= jsval_to_std_string(cx, args.get(0), &arg0_tmp); arg0 = arg0_tmp.c_str();
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration : Error processing arguments");
-        double ret = cobj->getSequenceDuration(arg0);
-        JS::RootedValue jsret(cx);
-        jsret = DOUBLE_TO_JSVAL(ret);
-        args.rval().set(jsret);
+        std::string arg0_tmp; ok &= seval_to_std_string(args[0], &arg0_tmp); arg0 = arg0_tmp.c_str();
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration : Error processing arguments");
+        float result = cobj->getSequenceDuration(arg0);
+        ok &= float_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::Node* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode : Error processing arguments");
         cobj->addDocumentCallbackNode(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         const char* arg0 = nullptr;
-        std::string arg0_tmp; ok &= jsval_to_std_string(cx, args.get(0), &arg0_tmp); arg0 = arg0_tmp.c_str();
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed : Error processing arguments");
+        std::string arg0_tmp; ok &= seval_to_std_string(args[0], &arg0_tmp); arg0 = arg0_tmp.c_str();
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed : Error processing arguments");
         cobj->runAnimationsForSequenceNamed(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getSequenceId(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getSequenceId(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceId : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceId : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         const char* arg0 = nullptr;
-        std::string arg0_tmp; ok &= jsval_to_std_string(cx, args.get(0), &arg0_tmp); arg0 = arg0_tmp.c_str();
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceId : Error processing arguments");
-        int ret = cobj->getSequenceId(arg0);
-        JS::RootedValue jsret(cx);
-        jsret = int32_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        std::string arg0_tmp; ok &= seval_to_std_string(args[0], &arg0_tmp); arg0 = arg0_tmp.c_str();
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceId : Error processing arguments");
+        int result = cobj->getSequenceId(arg0);
+        ok &= int32_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getSequenceId : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getSequenceId : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setCallFunc(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getSequenceId)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setCallFunc(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setCallFunc : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setCallFunc : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 2) {
         cocos2d::CallFunc* arg0 = nullptr;
         std::string arg1;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::CallFunc*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        ok &= jsval_to_std_string(cx, args.get(1), &arg1);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setCallFunc : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        ok &= seval_to_std_string(args[1], &arg1);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setCallFunc : Error processing arguments");
         cobj->setCallFunc(arg0, arg1);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setCallFunc : wrong number of arguments: %d, was expecting %d", argc, 2);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setCallFunc)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::Vector<cocos2d::Node *>& ret = cobj->getDocumentCallbackNodes();
-        JS::RootedValue jsret(cx);
-        jsret = ccvector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::Vector<cocos2d::Node *>& result = cobj->getDocumentCallbackNodes();
+        ok &= Vector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_setSequences(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_setSequences(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setSequences : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_setSequences : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::Vector<cocosbuilder::CCBSequence *> arg0;
-        ok &= jsval_to_ccvector(cx, args.get(0), &arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBAnimationManager_setSequences : Error processing arguments");
+        ok &= seval_to_Vector(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_setSequences : Error processing arguments");
         cobj->setSequences(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_setSequences : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_debug(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_setSequences)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_debug(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_debug : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_debug : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
     if (argc == 0) {
         cobj->debug();
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_debug : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_debug)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName : Invalid Native Object");
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        std::string ret = cobj->getDocumentControllerName();
-        JS::RootedValue jsret(cx);
-        jsret = std_string_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        std::string result = cobj->getDocumentControllerName();
+        ok &= std_string_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBAnimationManager_constructor(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName)
+
+SE_DECLARE_FINALIZE_FUNC(js_cocosbuilder_CCBAnimationManager_finalize)
+
+static bool js_cocos2dx_builder_CCBAnimationManager_constructor(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
     cocosbuilder::CCBAnimationManager* cobj = new (std::nothrow) cocosbuilder::CCBAnimationManager();
+    s.thisObject()->setPrivateData(cobj);
+    return true;
+}
+SE_BIND_CTOR(js_cocos2dx_builder_CCBAnimationManager_constructor, __jsb_cocosbuilder_CCBAnimationManager_class, js_cocosbuilder_CCBAnimationManager_finalize)
 
-    js_type_class_t *typeClass = js_get_type_from_native<cocosbuilder::CCBAnimationManager>(cobj);
 
-    // link the native object with the javascript object
-    JS::RootedObject jsobj(cx, jsb_ref_create_jsobject(cx, cobj, typeClass, "cocosbuilder::CCBAnimationManager"));
-    args.rval().set(OBJECT_TO_JSVAL(jsobj));
-    if (JS_HasProperty(cx, jsobj, "_ctor", &ok) && ok)
-        ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(jsobj), "_ctor", args);
+
+
+static bool js_cocosbuilder_CCBAnimationManager_finalize(se::State& s)
+{
+    CCLOGINFO("jsbindings: finalizing JS object %p (cocosbuilder::CCBAnimationManager)", s.nativeThisObject());
+    cocosbuilder::CCBAnimationManager* cobj = (cocosbuilder::CCBAnimationManager*)s.nativeThisObject();
+    cobj->release();
+    return true;
+}
+SE_BIND_FINALIZE_FUNC(js_cocosbuilder_CCBAnimationManager_finalize)
+
+bool js_register_cocos2dx_builder_CCBAnimationManager(se::Object* obj)
+{
+    auto cls = se::Class::create("BuilderAnimationManager", obj, nullptr, _SE(js_cocos2dx_builder_CCBAnimationManager_constructor));
+
+    cls->defineFunction("moveAnimationsFromNode", _SE(js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode));
+    cls->defineFunction("setAutoPlaySequenceId", _SE(js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId));
+    cls->defineFunction("getDocumentCallbackNames", _SE(js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames));
+    cls->defineFunction("actionForSoundChannel", _SE(js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel));
+    cls->defineFunction("setBaseValue", _SE(js_cocos2dx_builder_CCBAnimationManager_setBaseValue));
+    cls->defineFunction("getDocumentOutletNodes", _SE(js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes));
+    cls->defineFunction("getLastCompletedSequenceName", _SE(js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName));
+    cls->defineFunction("setRootNode", _SE(js_cocos2dx_builder_CCBAnimationManager_setRootNode));
+    cls->defineFunction("runAnimationsForSequenceNamedTweenDuration", _SE(js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration));
+    cls->defineFunction("addDocumentOutletName", _SE(js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName));
+    cls->defineFunction("getRootContainerSize", _SE(js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize));
+    cls->defineFunction("setDocumentControllerName", _SE(js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName));
+    cls->defineFunction("setObject", _SE(js_cocos2dx_builder_CCBAnimationManager_setObject));
+    cls->defineFunction("getContainerSize", _SE(js_cocos2dx_builder_CCBAnimationManager_getContainerSize));
+    cls->defineFunction("actionForCallbackChannel", _SE(js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel));
+    cls->defineFunction("getDocumentOutletNames", _SE(js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames));
+    cls->defineFunction("addDocumentCallbackControlEvents", _SE(js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents));
+    cls->defineFunction("init", _SE(js_cocos2dx_builder_CCBAnimationManager_init));
+    cls->defineFunction("getKeyframeCallbacks", _SE(js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks));
+    cls->defineFunction("getDocumentCallbackControlEvents", _SE(js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents));
+    cls->defineFunction("setRootContainerSize", _SE(js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize));
+    cls->defineFunction("runAnimationsForSequenceIdTweenDuration", _SE(js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration));
+    cls->defineFunction("getRunningSequenceName", _SE(js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName));
+    cls->defineFunction("getAutoPlaySequenceId", _SE(js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId));
+    cls->defineFunction("addDocumentCallbackName", _SE(js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName));
+    cls->defineFunction("getRootNode", _SE(js_cocos2dx_builder_CCBAnimationManager_getRootNode));
+    cls->defineFunction("addDocumentOutletNode", _SE(js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode));
+    cls->defineFunction("setDelegate", _SE(js_cocos2dx_builder_CCBAnimationManager_setDelegate));
+    cls->defineFunction("getSequenceDuration", _SE(js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration));
+    cls->defineFunction("addDocumentCallbackNode", _SE(js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode));
+    cls->defineFunction("runAnimationsForSequenceNamed", _SE(js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed));
+    cls->defineFunction("getSequenceId", _SE(js_cocos2dx_builder_CCBAnimationManager_getSequenceId));
+    cls->defineFunction("setCallFunc", _SE(js_cocos2dx_builder_CCBAnimationManager_setCallFunc));
+    cls->defineFunction("getDocumentCallbackNodes", _SE(js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes));
+    cls->defineFunction("setSequences", _SE(js_cocos2dx_builder_CCBAnimationManager_setSequences));
+    cls->defineFunction("debug", _SE(js_cocos2dx_builder_CCBAnimationManager_debug));
+    cls->defineFunction("getDocumentControllerName", _SE(js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName));
+    cls->defineFinalizeFunction(_SE(js_cocosbuilder_CCBAnimationManager_finalize));
+    cls->install();
+    JSBClassType::registerClass<cocosbuilder::CCBAnimationManager>(cls);
+
+    __jsb_cocosbuilder_CCBAnimationManager_proto = cls->getProto();
+    __jsb_cocosbuilder_CCBAnimationManager_class = cls;
+
+    se::ScriptEngine::getInstance()->clearException();
     return true;
 }
 
+se::Object* __jsb_cocosbuilder_CCBReader_proto = nullptr;
+se::Class* __jsb_cocosbuilder_CCBReader_class = nullptr;
 
-void js_register_cocos2dx_builder_CCBAnimationManager(JSContext *cx, JS::HandleObject global) {
-    jsb_cocosbuilder_CCBAnimationManager_class = (JSClass *)calloc(1, sizeof(JSClass));
-    jsb_cocosbuilder_CCBAnimationManager_class->name = "BuilderAnimationManager";
-    jsb_cocosbuilder_CCBAnimationManager_class->addProperty = JS_PropertyStub;
-    jsb_cocosbuilder_CCBAnimationManager_class->delProperty = JS_DeletePropertyStub;
-    jsb_cocosbuilder_CCBAnimationManager_class->getProperty = JS_PropertyStub;
-    jsb_cocosbuilder_CCBAnimationManager_class->setProperty = JS_StrictPropertyStub;
-    jsb_cocosbuilder_CCBAnimationManager_class->enumerate = JS_EnumerateStub;
-    jsb_cocosbuilder_CCBAnimationManager_class->resolve = JS_ResolveStub;
-    jsb_cocosbuilder_CCBAnimationManager_class->convert = JS_ConvertStub;
-    jsb_cocosbuilder_CCBAnimationManager_class->flags = JSCLASS_HAS_RESERVED_SLOTS(2);
-
-    static JSPropertySpec properties[] = {
-        JS_PS_END
-    };
-
-    static JSFunctionSpec funcs[] = {
-        JS_FN("moveAnimationsFromNode", js_cocos2dx_builder_CCBAnimationManager_moveAnimationsFromNode, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setAutoPlaySequenceId", js_cocos2dx_builder_CCBAnimationManager_setAutoPlaySequenceId, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getDocumentCallbackNames", js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNames, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("actionForSoundChannel", js_cocos2dx_builder_CCBAnimationManager_actionForSoundChannel, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setBaseValue", js_cocos2dx_builder_CCBAnimationManager_setBaseValue, 3, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getDocumentOutletNodes", js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNodes, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getLastCompletedSequenceName", js_cocos2dx_builder_CCBAnimationManager_getLastCompletedSequenceName, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setRootNode", js_cocos2dx_builder_CCBAnimationManager_setRootNode, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("runAnimationsForSequenceNamedTweenDuration", js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamedTweenDuration, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addDocumentOutletName", js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletName, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getRootContainerSize", js_cocos2dx_builder_CCBAnimationManager_getRootContainerSize, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setDocumentControllerName", js_cocos2dx_builder_CCBAnimationManager_setDocumentControllerName, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setObject", js_cocos2dx_builder_CCBAnimationManager_setObject, 3, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getContainerSize", js_cocos2dx_builder_CCBAnimationManager_getContainerSize, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("actionForCallbackChannel", js_cocos2dx_builder_CCBAnimationManager_actionForCallbackChannel, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getDocumentOutletNames", js_cocos2dx_builder_CCBAnimationManager_getDocumentOutletNames, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addDocumentCallbackControlEvents", js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackControlEvents, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("init", js_cocos2dx_builder_CCBAnimationManager_init, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getKeyframeCallbacks", js_cocos2dx_builder_CCBAnimationManager_getKeyframeCallbacks, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getDocumentCallbackControlEvents", js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackControlEvents, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setRootContainerSize", js_cocos2dx_builder_CCBAnimationManager_setRootContainerSize, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("runAnimationsForSequenceIdTweenDuration", js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceIdTweenDuration, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getRunningSequenceName", js_cocos2dx_builder_CCBAnimationManager_getRunningSequenceName, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getAutoPlaySequenceId", js_cocos2dx_builder_CCBAnimationManager_getAutoPlaySequenceId, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addDocumentCallbackName", js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackName, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getRootNode", js_cocos2dx_builder_CCBAnimationManager_getRootNode, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addDocumentOutletNode", js_cocos2dx_builder_CCBAnimationManager_addDocumentOutletNode, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setDelegate", js_cocos2dx_builder_CCBAnimationManager_setDelegate, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getSequenceDuration", js_cocos2dx_builder_CCBAnimationManager_getSequenceDuration, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addDocumentCallbackNode", js_cocos2dx_builder_CCBAnimationManager_addDocumentCallbackNode, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("runAnimationsForSequenceNamed", js_cocos2dx_builder_CCBAnimationManager_runAnimationsForSequenceNamed, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getSequenceId", js_cocos2dx_builder_CCBAnimationManager_getSequenceId, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setCallFunc", js_cocos2dx_builder_CCBAnimationManager_setCallFunc, 2, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getDocumentCallbackNodes", js_cocos2dx_builder_CCBAnimationManager_getDocumentCallbackNodes, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setSequences", js_cocos2dx_builder_CCBAnimationManager_setSequences, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("debug", js_cocos2dx_builder_CCBAnimationManager_debug, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getDocumentControllerName", js_cocos2dx_builder_CCBAnimationManager_getDocumentControllerName, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FS_END
-    };
-
-    JSFunctionSpec *st_funcs = NULL;
-
-    jsb_cocosbuilder_CCBAnimationManager_prototype = JS_InitClass(
-        cx, global,
-        JS::NullPtr(),
-        jsb_cocosbuilder_CCBAnimationManager_class,
-        js_cocos2dx_builder_CCBAnimationManager_constructor, 0, // constructor
-        properties,
-        funcs,
-        NULL, // no static properties
-        st_funcs);
-
-    JS::RootedObject proto(cx, jsb_cocosbuilder_CCBAnimationManager_prototype);
-    JS::RootedValue className(cx, std_string_to_jsval(cx, "CCBAnimationManager"));
-    JS_SetProperty(cx, proto, "_className", className);
-    JS_SetProperty(cx, proto, "__nativeObj", JS::TrueHandleValue);
-    JS_SetProperty(cx, proto, "__is_ref", JS::TrueHandleValue);
-    // add the proto and JSClass to the type->js info hash table
-    jsb_register_class<cocosbuilder::CCBAnimationManager>(cx, jsb_cocosbuilder_CCBAnimationManager_class, proto, JS::NullPtr());
-}
-
-JSClass  *jsb_cocosbuilder_CCBReader_class;
-JSObject *jsb_cocosbuilder_CCBReader_prototype;
-
-bool js_cocos2dx_builder_CCBReader_getAnimationManager(JSContext *cx, uint32_t argc, jsval *vp)
+static bool js_cocos2dx_builder_CCBReader_getAnimationManager(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getAnimationManager : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getAnimationManager : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocosbuilder::CCBAnimationManager* ret = cobj->getAnimationManager();
-        JS::RootedValue jsret(cx);
-        if (ret) {
-            jsret = OBJECT_TO_JSVAL(js_get_or_create_jsobject<cocosbuilder::CCBAnimationManager>(cx, (cocosbuilder::CCBAnimationManager*)ret));
-        } else {
-            jsret = JSVAL_NULL;
-        };
-        args.rval().set(jsret);
+        cocosbuilder::CCBAnimationManager* result = cobj->getAnimationManager();
+        ok &= native_ptr_to_seval<cocosbuilder::CCBAnimationManager>((cocosbuilder::CCBAnimationManager*)result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getAnimationManager : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getAnimationManager : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_setAnimationManager(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getAnimationManager)
+
+static bool js_cocos2dx_builder_CCBReader_setAnimationManager(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_setAnimationManager : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_setAnimationManager : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocosbuilder::CCBAnimationManager* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocosbuilder::CCBAnimationManager*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_setAnimationManager : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_setAnimationManager : Error processing arguments");
         cobj->setAnimationManager(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_setAnimationManager : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_addOwnerOutletName(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_setAnimationManager)
+
+static bool js_cocos2dx_builder_CCBReader_addOwnerOutletName(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletName : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletName : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         std::string arg0;
-        ok &= jsval_to_std_string(cx, args.get(0), &arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletName : Error processing arguments");
+        ok &= seval_to_std_string(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletName : Error processing arguments");
         cobj->addOwnerOutletName(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_addOwnerOutletName : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getOwnerCallbackNames(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_addOwnerOutletName)
+
+static bool js_cocos2dx_builder_CCBReader_getOwnerCallbackNames(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNames : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNames : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::ValueVector ret = cobj->getOwnerCallbackNames();
-        JS::RootedValue jsret(cx);
-        jsret = ccvaluevector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::ValueVector result = cobj->getOwnerCallbackNames();
+        ok &= ccvaluevector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNames : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNames : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getOwnerCallbackNames)
+
+static bool js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::extension::Control::EventType arg0;
-        ok &= jsval_to_int32(cx, args.get(0), (int32_t *)&arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents : Error processing arguments");
+        do { int32_t tmp = 0; ok &= seval_to_int32(args[0], &tmp); arg0 = (cocos2d::extension::Control::EventType)tmp; } while(false);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents : Error processing arguments");
         cobj->addDocumentCallbackControlEvents(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_setCCBRootPath(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents)
+
+static bool js_cocos2dx_builder_CCBReader_setCCBRootPath(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_setCCBRootPath : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_setCCBRootPath : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         const char* arg0 = nullptr;
-        std::string arg0_tmp; ok &= jsval_to_std_string(cx, args.get(0), &arg0_tmp); arg0 = arg0_tmp.c_str();
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_setCCBRootPath : Error processing arguments");
+        std::string arg0_tmp; ok &= seval_to_std_string(args[0], &arg0_tmp); arg0 = arg0_tmp.c_str();
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_setCCBRootPath : Error processing arguments");
         cobj->setCCBRootPath(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_setCCBRootPath : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_addOwnerOutletNode(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_setCCBRootPath)
+
+static bool js_cocos2dx_builder_CCBReader_addOwnerOutletNode(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletNode : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletNode : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::Node* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocos2d::Node*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletNode : Error processing arguments");
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_addOwnerOutletNode : Error processing arguments");
         cobj->addOwnerOutletNode(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_addOwnerOutletNode : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_addOwnerOutletNode)
+
+static bool js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::Vector<cocos2d::Node *>& ret = cobj->getOwnerCallbackNodes();
-        JS::RootedValue jsret(cx);
-        jsret = ccvector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::Vector<cocos2d::Node *>& result = cobj->getOwnerCallbackNodes();
+        ok &= Vector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes)
+
+static bool js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocosbuilder::CCBSequence* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocosbuilder::CCBSequence*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq : Error processing arguments");
-        bool ret = cobj->readSoundKeyframesForSeq(arg0);
-        JS::RootedValue jsret(cx);
-        jsret = BOOLEAN_TO_JSVAL(ret);
-        args.rval().set(jsret);
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq : Error processing arguments");
+        bool result = cobj->readSoundKeyframesForSeq(arg0);
+        ok &= boolean_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getCCBRootPath(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq)
+
+static bool js_cocos2dx_builder_CCBReader_getCCBRootPath(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getCCBRootPath : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getCCBRootPath : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        const std::string& ret = cobj->getCCBRootPath();
-        JS::RootedValue jsret(cx);
-        jsret = std_string_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        const std::string& result = cobj->getCCBRootPath();
+        ok &= std_string_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getCCBRootPath : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getCCBRootPath : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getCCBRootPath)
+
+static bool js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::ValueVector& ret = cobj->getOwnerCallbackControlEvents();
-        JS::RootedValue jsret(cx);
-        jsret = ccvaluevector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::ValueVector& result = cobj->getOwnerCallbackControlEvents();
+        ok &= ccvaluevector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getOwnerOutletNodes(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents)
+
+static bool js_cocos2dx_builder_CCBReader_getOwnerOutletNodes(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getOwnerOutletNodes : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getOwnerOutletNodes : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::Vector<cocos2d::Node *>& ret = cobj->getOwnerOutletNodes();
-        JS::RootedValue jsret(cx);
-        jsret = ccvector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::Vector<cocos2d::Node *>& result = cobj->getOwnerOutletNodes();
+        ok &= Vector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getOwnerOutletNodes : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getOwnerOutletNodes : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_readUTF8(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getOwnerOutletNodes)
+
+static bool js_cocos2dx_builder_CCBReader_readUTF8(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_readUTF8 : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_readUTF8 : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        std::string ret = cobj->readUTF8();
-        JS::RootedValue jsret(cx);
-        jsret = std_string_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        std::string result = cobj->readUTF8();
+        ok &= std_string_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_readUTF8 : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_readUTF8 : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_readUTF8)
+
+static bool js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocos2d::extension::Control::EventType arg0;
-        ok &= jsval_to_int32(cx, args.get(0), (int32_t *)&arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents : Error processing arguments");
+        do { int32_t tmp = 0; ok &= seval_to_int32(args[0], &tmp); arg0 = (cocos2d::extension::Control::EventType)tmp; } while(false);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents : Error processing arguments");
         cobj->addOwnerCallbackControlEvents(arg0);
-        args.rval().setUndefined();
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getOwnerOutletNames(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents)
+
+static bool js_cocos2dx_builder_CCBReader_getOwnerOutletNames(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getOwnerOutletNames : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getOwnerOutletNames : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::ValueVector ret = cobj->getOwnerOutletNames();
-        JS::RootedValue jsret(cx);
-        jsret = ccvaluevector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::ValueVector result = cobj->getOwnerOutletNames();
+        ok &= ccvaluevector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getOwnerOutletNames : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getOwnerOutletNames : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getOwnerOutletNames)
+
+static bool js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
         cocosbuilder::CCBSequence* arg0 = nullptr;
-        do {
-            if (args.get(0).isNull()) { arg0 = nullptr; break; }
-            if (!args.get(0).isObject()) { ok = false; break; }
-            js_proxy_t *jsProxy;
-            JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-            jsProxy = jsb_get_js_proxy(tmpObj);
-            arg0 = (cocosbuilder::CCBSequence*)(jsProxy ? jsProxy->ptr : NULL);
-            JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-        } while (0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq : Error processing arguments");
-        bool ret = cobj->readCallbackKeyframesForSeq(arg0);
-        JS::RootedValue jsret(cx);
-        jsret = BOOLEAN_TO_JSVAL(ret);
-        args.rval().set(jsret);
+        ok &= seval_to_native_ptr(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq : Error processing arguments");
+        bool result = cobj->readCallbackKeyframesForSeq(arg0);
+        ok &= boolean_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq : wrong number of arguments: %d, was expecting %d", argc, 1);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq)
+
+static bool js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::Vector<cocosbuilder::CCBAnimationManager *>& ret = cobj->getAnimationManagersForNodes();
-        JS::RootedValue jsret(cx);
-        jsret = ccvector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::Vector<cocosbuilder::CCBAnimationManager *>& result = cobj->getAnimationManagersForNodes();
+        ok &= Vector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes)
+
+static bool js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx, args.thisv().toObjectOrNull());
-    js_proxy_t *proxy = jsb_get_js_proxy(obj);
-    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader *)(proxy ? proxy->ptr : NULL);
-    JSB_PRECONDITION2( cobj, cx, false, "js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers : Invalid Native Object");
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    SE_PRECONDITION2(cobj, false, "js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 0) {
-        cocos2d::Vector<cocos2d::Node *>& ret = cobj->getNodesWithAnimationManagers();
-        JS::RootedValue jsret(cx);
-        jsret = ccvector_to_jsval(cx, ret);
-        args.rval().set(jsret);
+        cocos2d::Vector<cocos2d::Node *>& result = cobj->getNodesWithAnimationManagers();
+        ok &= Vector_to_seval(result, &s.rval());
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers : Error processing arguments");
         return true;
     }
-
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers : wrong number of arguments: %d, was expecting %d", argc, 0);
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-bool js_cocos2dx_builder_CCBReader_setResolutionScale(JSContext *cx, uint32_t argc, jsval *vp)
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers)
+
+static bool js_cocos2dx_builder_CCBReader_setResolutionScale(se::State& s)
 {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
     if (argc == 1) {
-        double arg0 = 0;
-        ok &= JS::ToNumber( cx, args.get(0), &arg0) && !std::isnan(arg0);
-        JSB_PRECONDITION2(ok, cx, false, "js_cocos2dx_builder_CCBReader_setResolutionScale : Error processing arguments");
+        float arg0 = 0;
+        ok &= seval_to_float(args[0], &arg0);
+        SE_PRECONDITION2(ok, false, "js_cocos2dx_builder_CCBReader_setResolutionScale : Error processing arguments");
         cocosbuilder::CCBReader::setResolutionScale(arg0);
-        args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_setResolutionScale : wrong number of arguments");
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
+SE_BIND_FUNC(js_cocos2dx_builder_CCBReader_setResolutionScale)
 
-bool js_cocos2dx_builder_CCBReader_constructor(JSContext *cx, uint32_t argc, jsval *vp)
+SE_DECLARE_FINALIZE_FUNC(js_cocosbuilder_CCBReader_finalize)
+
+static bool js_cocos2dx_builder_CCBReader_constructor(se::State& s)
 {
-    bool ok = true;
-    cocosbuilder::CCBReader* cobj = nullptr;
-
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedObject obj(cx);
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
     do {
         if (argc == 1) {
             cocosbuilder::CCBReader* arg0 = nullptr;
-            do {
-                if (args.get(0).isNull()) { arg0 = nullptr; break; }
-                if (!args.get(0).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg0 = (cocosbuilder::CCBReader*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[0], &arg0);
             if (!ok) { ok = true; break; }
-            cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0);
-
-            js_type_class_t *typeClass = js_get_type_from_native<cocosbuilder::CCBReader>(cobj);
-            JS::RootedObject proto(cx, typeClass->proto.ref());
-            JS::RootedObject parent(cx, typeClass->parentProto.ref());
-            obj = JS_NewObject(cx, typeClass->jsclass, proto, parent);
-            js_proxy_t* p = jsb_new_proxy(cobj, obj);
-            jsb_ref_init(cx, &p->obj, cobj, "cocosbuilder::CCBReader");
+            cocosbuilder::CCBReader* cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0);
+            s.thisObject()->setPrivateData(cobj);
+            return true;
         }
-    } while(0);
-
+    } while(false);
     do {
         if (argc == 1) {
             cocosbuilder::NodeLoaderLibrary* arg0 = nullptr;
-            do {
-                if (args.get(0).isNull()) { arg0 = nullptr; break; }
-                if (!args.get(0).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg0 = (cocosbuilder::NodeLoaderLibrary*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[0], &arg0);
             if (!ok) { ok = true; break; }
-            cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0);
-
-            js_type_class_t *typeClass = js_get_type_from_native<cocosbuilder::CCBReader>(cobj);
-            JS::RootedObject proto(cx, typeClass->proto.ref());
-            JS::RootedObject parent(cx, typeClass->parentProto.ref());
-            obj = JS_NewObject(cx, typeClass->jsclass, proto, parent);
-            js_proxy_t* p = jsb_new_proxy(cobj, obj);
-            jsb_ref_init(cx, &p->obj, cobj, "cocosbuilder::CCBReader");
+            cocosbuilder::CCBReader* cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0);
+            s.thisObject()->setPrivateData(cobj);
+            return true;
         }
-    } while(0);
-
+    } while(false);
     do {
         if (argc == 2) {
             cocosbuilder::NodeLoaderLibrary* arg0 = nullptr;
-            do {
-                if (args.get(0).isNull()) { arg0 = nullptr; break; }
-                if (!args.get(0).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg0 = (cocosbuilder::NodeLoaderLibrary*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[0], &arg0);
             if (!ok) { ok = true; break; }
             cocosbuilder::CCBMemberVariableAssigner* arg1 = nullptr;
-            do {
-                if (args.get(1).isNull()) { arg1 = nullptr; break; }
-                if (!args.get(1).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(1).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg1 = (cocosbuilder::CCBMemberVariableAssigner*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg1, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[1], &arg1);
             if (!ok) { ok = true; break; }
-            cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0, arg1);
-
-            js_type_class_t *typeClass = js_get_type_from_native<cocosbuilder::CCBReader>(cobj);
-            JS::RootedObject proto(cx, typeClass->proto.ref());
-            JS::RootedObject parent(cx, typeClass->parentProto.ref());
-            obj = JS_NewObject(cx, typeClass->jsclass, proto, parent);
-            js_proxy_t* p = jsb_new_proxy(cobj, obj);
-            jsb_ref_init(cx, &p->obj, cobj, "cocosbuilder::CCBReader");
+            cocosbuilder::CCBReader* cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0, arg1);
+            s.thisObject()->setPrivateData(cobj);
+            return true;
         }
-    } while(0);
-
+    } while(false);
     do {
         if (argc == 3) {
             cocosbuilder::NodeLoaderLibrary* arg0 = nullptr;
-            do {
-                if (args.get(0).isNull()) { arg0 = nullptr; break; }
-                if (!args.get(0).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg0 = (cocosbuilder::NodeLoaderLibrary*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[0], &arg0);
             if (!ok) { ok = true; break; }
             cocosbuilder::CCBMemberVariableAssigner* arg1 = nullptr;
-            do {
-                if (args.get(1).isNull()) { arg1 = nullptr; break; }
-                if (!args.get(1).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(1).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg1 = (cocosbuilder::CCBMemberVariableAssigner*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg1, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[1], &arg1);
             if (!ok) { ok = true; break; }
             cocosbuilder::CCBSelectorResolver* arg2 = nullptr;
-            do {
-                if (args.get(2).isNull()) { arg2 = nullptr; break; }
-                if (!args.get(2).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(2).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg2 = (cocosbuilder::CCBSelectorResolver*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg2, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[2], &arg2);
             if (!ok) { ok = true; break; }
-            cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0, arg1, arg2);
-
-            js_type_class_t *typeClass = js_get_type_from_native<cocosbuilder::CCBReader>(cobj);
-            JS::RootedObject proto(cx, typeClass->proto.ref());
-            JS::RootedObject parent(cx, typeClass->parentProto.ref());
-            obj = JS_NewObject(cx, typeClass->jsclass, proto, parent);
-            js_proxy_t* p = jsb_new_proxy(cobj, obj);
-            jsb_ref_init(cx, &p->obj, cobj, "cocosbuilder::CCBReader");
+            cocosbuilder::CCBReader* cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0, arg1, arg2);
+            s.thisObject()->setPrivateData(cobj);
+            return true;
         }
-    } while(0);
-
+    } while(false);
     do {
         if (argc == 4) {
             cocosbuilder::NodeLoaderLibrary* arg0 = nullptr;
-            do {
-                if (args.get(0).isNull()) { arg0 = nullptr; break; }
-                if (!args.get(0).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(0).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg0 = (cocosbuilder::NodeLoaderLibrary*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg0, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[0], &arg0);
             if (!ok) { ok = true; break; }
             cocosbuilder::CCBMemberVariableAssigner* arg1 = nullptr;
-            do {
-                if (args.get(1).isNull()) { arg1 = nullptr; break; }
-                if (!args.get(1).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(1).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg1 = (cocosbuilder::CCBMemberVariableAssigner*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg1, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[1], &arg1);
             if (!ok) { ok = true; break; }
             cocosbuilder::CCBSelectorResolver* arg2 = nullptr;
-            do {
-                if (args.get(2).isNull()) { arg2 = nullptr; break; }
-                if (!args.get(2).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(2).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg2 = (cocosbuilder::CCBSelectorResolver*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg2, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[2], &arg2);
             if (!ok) { ok = true; break; }
             cocosbuilder::NodeLoaderListener* arg3 = nullptr;
-            do {
-                if (args.get(3).isNull()) { arg3 = nullptr; break; }
-                if (!args.get(3).isObject()) { ok = false; break; }
-                js_proxy_t *jsProxy;
-                JS::RootedObject tmpObj(cx, args.get(3).toObjectOrNull());
-                jsProxy = jsb_get_js_proxy(tmpObj);
-                arg3 = (cocosbuilder::NodeLoaderListener*)(jsProxy ? jsProxy->ptr : NULL);
-                JSB_PRECONDITION2( arg3, cx, false, "Invalid Native Object");
-            } while (0);
+            ok &= seval_to_native_ptr(args[3], &arg3);
             if (!ok) { ok = true; break; }
-            cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0, arg1, arg2, arg3);
-
-            js_type_class_t *typeClass = js_get_type_from_native<cocosbuilder::CCBReader>(cobj);
-            JS::RootedObject proto(cx, typeClass->proto.ref());
-            JS::RootedObject parent(cx, typeClass->parentProto.ref());
-            obj = JS_NewObject(cx, typeClass->jsclass, proto, parent);
-            js_proxy_t* p = jsb_new_proxy(cobj, obj);
-            jsb_ref_init(cx, &p->obj, cobj, "cocosbuilder::CCBReader");
+            cocosbuilder::CCBReader* cobj = new (std::nothrow) cocosbuilder::CCBReader(arg0, arg1, arg2, arg3);
+            s.thisObject()->setPrivateData(cobj);
+            return true;
         }
-    } while(0);
-
+    } while(false);
     do {
         if (argc == 0) {
-            cobj = new (std::nothrow) cocosbuilder::CCBReader();
-
-            js_type_class_t *typeClass = js_get_type_from_native<cocosbuilder::CCBReader>(cobj);
-            JS::RootedObject proto(cx, typeClass->proto.ref());
-            JS::RootedObject parent(cx, typeClass->parentProto.ref());
-            obj = JS_NewObject(cx, typeClass->jsclass, proto, parent);
-            js_proxy_t* p = jsb_new_proxy(cobj, obj);
-            jsb_ref_init(cx, &p->obj, cobj, "cocosbuilder::CCBReader");
+            cocosbuilder::CCBReader* cobj = new (std::nothrow) cocosbuilder::CCBReader();
+            s.thisObject()->setPrivateData(cobj);
+            return true;
         }
-    } while(0);
-
-    if (cobj) {
-        if (JS_HasProperty(cx, obj, "_ctor", &ok) && ok)
-                ScriptingCore::getInstance()->executeFunctionWithOwner(OBJECT_TO_JSVAL(obj), "_ctor", args);
-
-        args.rval().set(OBJECT_TO_JSVAL(obj));
-        return true;
-    }
-    JS_ReportError(cx, "js_cocos2dx_builder_CCBReader_constructor : wrong number of arguments");
+    } while(false);
+    SE_REPORT_ERROR("wrong number of arguments: %d", (int)argc);
     return false;
 }
+SE_BIND_CTOR(js_cocos2dx_builder_CCBReader_constructor, __jsb_cocosbuilder_CCBReader_class, js_cocosbuilder_CCBReader_finalize)
 
 
-void js_register_cocos2dx_builder_CCBReader(JSContext *cx, JS::HandleObject global) {
-    jsb_cocosbuilder_CCBReader_class = (JSClass *)calloc(1, sizeof(JSClass));
-    jsb_cocosbuilder_CCBReader_class->name = "_Reader";
-    jsb_cocosbuilder_CCBReader_class->addProperty = JS_PropertyStub;
-    jsb_cocosbuilder_CCBReader_class->delProperty = JS_DeletePropertyStub;
-    jsb_cocosbuilder_CCBReader_class->getProperty = JS_PropertyStub;
-    jsb_cocosbuilder_CCBReader_class->setProperty = JS_StrictPropertyStub;
-    jsb_cocosbuilder_CCBReader_class->enumerate = JS_EnumerateStub;
-    jsb_cocosbuilder_CCBReader_class->resolve = JS_ResolveStub;
-    jsb_cocosbuilder_CCBReader_class->convert = JS_ConvertStub;
-    jsb_cocosbuilder_CCBReader_class->flags = JSCLASS_HAS_RESERVED_SLOTS(2);
 
-    static JSPropertySpec properties[] = {
-        JS_PS_END
-    };
 
-    static JSFunctionSpec funcs[] = {
-        JS_FN("getAnimationManager", js_cocos2dx_builder_CCBReader_getAnimationManager, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setAnimationManager", js_cocos2dx_builder_CCBReader_setAnimationManager, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addOwnerOutletName", js_cocos2dx_builder_CCBReader_addOwnerOutletName, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getOwnerCallbackNames", js_cocos2dx_builder_CCBReader_getOwnerCallbackNames, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addDocumentCallbackControlEvents", js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("setCCBRootPath", js_cocos2dx_builder_CCBReader_setCCBRootPath, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addOwnerOutletNode", js_cocos2dx_builder_CCBReader_addOwnerOutletNode, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getOwnerCallbackNodes", js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("readSoundKeyframesForSeq", js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getCCBRootPath", js_cocos2dx_builder_CCBReader_getCCBRootPath, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getOwnerCallbackControlEvents", js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getOwnerOutletNodes", js_cocos2dx_builder_CCBReader_getOwnerOutletNodes, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("readUTF8", js_cocos2dx_builder_CCBReader_readUTF8, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("addOwnerCallbackControlEvents", js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getOwnerOutletNames", js_cocos2dx_builder_CCBReader_getOwnerOutletNames, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("readCallbackKeyframesForSeq", js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getAnimationManagersForNodes", js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FN("getNodesWithAnimationManagers", js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers, 0, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FS_END
-    };
+static bool js_cocosbuilder_CCBReader_finalize(se::State& s)
+{
+    CCLOGINFO("jsbindings: finalizing JS object %p (cocosbuilder::CCBReader)", s.nativeThisObject());
+    cocosbuilder::CCBReader* cobj = (cocosbuilder::CCBReader*)s.nativeThisObject();
+    cobj->release();
+    return true;
+}
+SE_BIND_FINALIZE_FUNC(js_cocosbuilder_CCBReader_finalize)
 
-    static JSFunctionSpec st_funcs[] = {
-        JS_FN("setResolutionScale", js_cocos2dx_builder_CCBReader_setResolutionScale, 1, JSPROP_PERMANENT | JSPROP_ENUMERATE),
-        JS_FS_END
-    };
+bool js_register_cocos2dx_builder_CCBReader(se::Object* obj)
+{
+    auto cls = se::Class::create("_Reader", obj, nullptr, _SE(js_cocos2dx_builder_CCBReader_constructor));
 
-    jsb_cocosbuilder_CCBReader_prototype = JS_InitClass(
-        cx, global,
-        JS::NullPtr(),
-        jsb_cocosbuilder_CCBReader_class,
-        js_cocos2dx_builder_CCBReader_constructor, 0, // constructor
-        properties,
-        funcs,
-        NULL, // no static properties
-        st_funcs);
+    cls->defineFunction("getAnimationManager", _SE(js_cocos2dx_builder_CCBReader_getAnimationManager));
+    cls->defineFunction("setAnimationManager", _SE(js_cocos2dx_builder_CCBReader_setAnimationManager));
+    cls->defineFunction("addOwnerOutletName", _SE(js_cocos2dx_builder_CCBReader_addOwnerOutletName));
+    cls->defineFunction("getOwnerCallbackNames", _SE(js_cocos2dx_builder_CCBReader_getOwnerCallbackNames));
+    cls->defineFunction("addDocumentCallbackControlEvents", _SE(js_cocos2dx_builder_CCBReader_addDocumentCallbackControlEvents));
+    cls->defineFunction("setCCBRootPath", _SE(js_cocos2dx_builder_CCBReader_setCCBRootPath));
+    cls->defineFunction("addOwnerOutletNode", _SE(js_cocos2dx_builder_CCBReader_addOwnerOutletNode));
+    cls->defineFunction("getOwnerCallbackNodes", _SE(js_cocos2dx_builder_CCBReader_getOwnerCallbackNodes));
+    cls->defineFunction("readSoundKeyframesForSeq", _SE(js_cocos2dx_builder_CCBReader_readSoundKeyframesForSeq));
+    cls->defineFunction("getCCBRootPath", _SE(js_cocos2dx_builder_CCBReader_getCCBRootPath));
+    cls->defineFunction("getOwnerCallbackControlEvents", _SE(js_cocos2dx_builder_CCBReader_getOwnerCallbackControlEvents));
+    cls->defineFunction("getOwnerOutletNodes", _SE(js_cocos2dx_builder_CCBReader_getOwnerOutletNodes));
+    cls->defineFunction("readUTF8", _SE(js_cocos2dx_builder_CCBReader_readUTF8));
+    cls->defineFunction("addOwnerCallbackControlEvents", _SE(js_cocos2dx_builder_CCBReader_addOwnerCallbackControlEvents));
+    cls->defineFunction("getOwnerOutletNames", _SE(js_cocos2dx_builder_CCBReader_getOwnerOutletNames));
+    cls->defineFunction("readCallbackKeyframesForSeq", _SE(js_cocos2dx_builder_CCBReader_readCallbackKeyframesForSeq));
+    cls->defineFunction("getAnimationManagersForNodes", _SE(js_cocos2dx_builder_CCBReader_getAnimationManagersForNodes));
+    cls->defineFunction("getNodesWithAnimationManagers", _SE(js_cocos2dx_builder_CCBReader_getNodesWithAnimationManagers));
+    cls->defineStaticFunction("setResolutionScale", _SE(js_cocos2dx_builder_CCBReader_setResolutionScale));
+    cls->defineFinalizeFunction(_SE(js_cocosbuilder_CCBReader_finalize));
+    cls->install();
+    JSBClassType::registerClass<cocosbuilder::CCBReader>(cls);
 
-    JS::RootedObject proto(cx, jsb_cocosbuilder_CCBReader_prototype);
-    JS::RootedValue className(cx, std_string_to_jsval(cx, "CCBReader"));
-    JS_SetProperty(cx, proto, "_className", className);
-    JS_SetProperty(cx, proto, "__nativeObj", JS::TrueHandleValue);
-    JS_SetProperty(cx, proto, "__is_ref", JS::TrueHandleValue);
-    // add the proto and JSClass to the type->js info hash table
-    jsb_register_class<cocosbuilder::CCBReader>(cx, jsb_cocosbuilder_CCBReader_class, proto, JS::NullPtr());
+    __jsb_cocosbuilder_CCBReader_proto = cls->getProto();
+    __jsb_cocosbuilder_CCBReader_class = cls;
+
+    se::ScriptEngine::getInstance()->clearException();
+    return true;
 }
 
-void register_all_cocos2dx_builder(JSContext* cx, JS::HandleObject obj) {
+bool register_all_cocos2dx_builder(se::Object* obj)
+{
     // Get the ns
-    JS::RootedObject ns(cx);
-    get_or_create_js_obj(cx, obj, "cc", &ns);
+    se::Value nsVal;
+    if (!obj->getProperty("cc", &nsVal))
+    {
+        se::HandleObject jsobj(se::Object::createPlainObject());
+        nsVal.setObject(jsobj);
+        obj->setProperty("cc", nsVal);
+    }
+    se::Object* ns = nsVal.toObject();
 
-    js_register_cocos2dx_builder_CCBAnimationManager(cx, ns);
-    js_register_cocos2dx_builder_CCBReader(cx, ns);
+    js_register_cocos2dx_builder_CCBAnimationManager(ns);
+    js_register_cocos2dx_builder_CCBReader(ns);
+    return true;
 }
 

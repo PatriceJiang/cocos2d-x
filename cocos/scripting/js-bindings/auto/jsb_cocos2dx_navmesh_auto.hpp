@@ -1,84 +1,75 @@
+#pragma once
 #include "base/ccConfig.h"
 #if CC_USE_NAVMESH
-#ifndef __cocos2dx_navmesh_h__
-#define __cocos2dx_navmesh_h__
 
-#include "jsapi.h"
-#include "jsfriendapi.h"
+#include "cocos/scripting/js-bindings/jswrapper/SeApi.h"
 
-extern JSClass  *jsb_cocos2d_NavMeshAgent_class;
-extern JSObject *jsb_cocos2d_NavMeshAgent_prototype;
+extern se::Object* __jsb_cocos2d_NavMeshAgent_proto;
+extern se::Class* __jsb_cocos2d_NavMeshAgent_class;
 
-bool js_cocos2dx_navmesh_NavMeshAgent_constructor(JSContext *cx, uint32_t argc, jsval *vp);
-void js_cocos2dx_navmesh_NavMeshAgent_finalize(JSContext *cx, JSObject *obj);
-void js_register_cocos2dx_navmesh_NavMeshAgent(JSContext *cx, JS::HandleObject global);
-void register_all_cocos2dx_navmesh(JSContext* cx, JS::HandleObject obj);
-bool js_cocos2dx_navmesh_NavMeshAgent_setMaxSpeed(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_syncToNode(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_completeOffMeshLink(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getSeparationWeight(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setAutoTraverseOffMeshLink(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getCurrentVelocity(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_syncToAgent(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_isOnOffMeshLink(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setSeparationWeight(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_pause(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setAutoOrientation(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getHeight(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getMaxSpeed(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getCurrentOffMeshLinkData(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getRadius(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setSyncFlag(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getSyncFlag(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_resume(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_stop(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setMaxAcceleration(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setOrientationRefAxes(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getMaxAcceleration(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setHeight(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getObstacleAvoidanceType(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getVelocity(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setRadius(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_setObstacleAvoidanceType(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_getNavMeshAgentComponentName(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_create(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshAgent_NavMeshAgent(JSContext *cx, uint32_t argc, jsval *vp);
+bool js_register_cocos2d_NavMeshAgent(se::Object* obj);
+bool register_all_cocos2dx_navmesh(se::Object* obj);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setMaxSpeed);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_syncToNode);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_completeOffMeshLink);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getSeparationWeight);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setAutoTraverseOffMeshLink);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getCurrentVelocity);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_syncToAgent);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_isOnOffMeshLink);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setSeparationWeight);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_pause);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setAutoOrientation);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getHeight);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getMaxSpeed);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getCurrentOffMeshLinkData);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getRadius);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setSyncFlag);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getSyncFlag);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_resume);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_stop);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setMaxAcceleration);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setOrientationRefAxes);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getMaxAcceleration);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setHeight);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getObstacleAvoidanceType);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getVelocity);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setRadius);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_setObstacleAvoidanceType);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_getNavMeshAgentComponentName);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_create);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshAgent_NavMeshAgent);
 
-extern JSClass  *jsb_cocos2d_NavMeshObstacle_class;
-extern JSObject *jsb_cocos2d_NavMeshObstacle_prototype;
+extern se::Object* __jsb_cocos2d_NavMeshObstacle_proto;
+extern se::Class* __jsb_cocos2d_NavMeshObstacle_class;
 
-bool js_cocos2dx_navmesh_NavMeshObstacle_constructor(JSContext *cx, uint32_t argc, jsval *vp);
-void js_cocos2dx_navmesh_NavMeshObstacle_finalize(JSContext *cx, JSObject *obj);
-void js_register_cocos2dx_navmesh_NavMeshObstacle(JSContext *cx, JS::HandleObject global);
-void register_all_cocos2dx_navmesh(JSContext* cx, JS::HandleObject obj);
-bool js_cocos2dx_navmesh_NavMeshObstacle_getSyncFlag(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_initWith(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_syncToObstacle(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_syncToNode(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_getHeight(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_setSyncFlag(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_getRadius(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_create(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_getNavMeshObstacleComponentName(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMeshObstacle_NavMeshObstacle(JSContext *cx, uint32_t argc, jsval *vp);
+bool js_register_cocos2d_NavMeshObstacle(se::Object* obj);
+bool register_all_cocos2dx_navmesh(se::Object* obj);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_getSyncFlag);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_initWith);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_syncToObstacle);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_syncToNode);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_getHeight);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_setSyncFlag);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_getRadius);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_create);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_getNavMeshObstacleComponentName);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMeshObstacle_NavMeshObstacle);
 
-extern JSClass  *jsb_cocos2d_NavMesh_class;
-extern JSObject *jsb_cocos2d_NavMesh_prototype;
+extern se::Object* __jsb_cocos2d_NavMesh_proto;
+extern se::Class* __jsb_cocos2d_NavMesh_class;
 
-bool js_cocos2dx_navmesh_NavMesh_constructor(JSContext *cx, uint32_t argc, jsval *vp);
-void js_cocos2dx_navmesh_NavMesh_finalize(JSContext *cx, JSObject *obj);
-void js_register_cocos2dx_navmesh_NavMesh(JSContext *cx, JS::HandleObject global);
-void register_all_cocos2dx_navmesh(JSContext* cx, JS::HandleObject obj);
-bool js_cocos2dx_navmesh_NavMesh_removeNavMeshObstacle(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_removeNavMeshAgent(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_update(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_isDebugDrawEnabled(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_addNavMeshAgent(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_addNavMeshObstacle(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_setDebugDrawEnable(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_debugDraw(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_create(JSContext *cx, uint32_t argc, jsval *vp);
-bool js_cocos2dx_navmesh_NavMesh_NavMesh(JSContext *cx, uint32_t argc, jsval *vp);
+bool js_register_cocos2d_NavMesh(se::Object* obj);
+bool register_all_cocos2dx_navmesh(se::Object* obj);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_removeNavMeshObstacle);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_removeNavMeshAgent);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_update);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_isDebugDrawEnabled);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_addNavMeshAgent);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_addNavMeshObstacle);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_setDebugDrawEnable);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_debugDraw);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_create);
+SE_DECLARE_FUNC(js_cocos2dx_navmesh_NavMesh_NavMesh);
 
-#endif // __cocos2dx_navmesh_h__
 #endif //#if CC_USE_NAVMESH

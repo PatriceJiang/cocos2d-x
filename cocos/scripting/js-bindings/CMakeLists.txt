@@ -73,6 +73,7 @@ set(JSBINDING_HEADER
     manual/3d/jsb_cocos2dx_3d_manual.h
     manual/cocosbuilder/js_bindings_ccbreader.h
     manual/js_manual_conversions.h
+    manual/jsb_conversions.hpp #NOTICE: may be duplicate 
     manual/extension/jsb_cocos2dx_extension_manual.h
     manual/spine/jsb_cocos2dx_spine_manual.h
     manual/jsb_opengl_registration.h
@@ -121,6 +122,7 @@ set(JSBINDING_SRC
     manual/ScriptingCore.cpp
     manual/cocos2d_specifics.cpp
     manual/js_manual_conversions.cpp
+    manual/jsb_conversions.cpp #NOTICE: may be duplicate 
     manual/js_bindings_core.cpp
     manual/js_bindings_opengl.cpp
     manual/jsb_opengl_functions.cpp

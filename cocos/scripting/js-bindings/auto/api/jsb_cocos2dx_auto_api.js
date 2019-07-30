@@ -3988,6 +3988,14 @@ hasPremultipliedAlpha : function (
 },
 
 /**
+ * @method reversePremultipliedAlpha
+ */
+reversePremultipliedAlpha : function (
+)
+{
+},
+
+/**
  * @method getDataLen
  * @return {int}
  */
@@ -4039,6 +4047,14 @@ getHeight : function (
 )
 {
     return 0;
+},
+
+/**
+ * @method premultiplyAlpha
+ */
+premultiplyAlpha : function (
+)
+{
 },
 
 /**
@@ -13992,7 +14008,7 @@ float
 * @param {color4b_object|color4b_object} color4b
 * @param {float} float
 * @param {float} float
-* @return {bool|bool}
+* @return {bool|bool|bool}
 */
 initWithColor : function(
 color4b,
@@ -15162,14 +15178,6 @@ isEnabled : function (
 },
 
 /**
- * @method alignItemsHorizontally
- */
-alignItemsHorizontally : function (
-)
-{
-},
-
-/**
  * @method alignItemsHorizontallyWithPadding
  * @param {float} arg0
  */
@@ -15185,6 +15193,14 @@ float
  */
 alignItemsVerticallyWithPadding : function (
 float 
+)
+{
+},
+
+/**
+ * @method alignItemsHorizontally
+ */
+alignItemsHorizontally : function (
 )
 {
 },
@@ -23188,15 +23204,15 @@ getParallaxArray : function(
 
 /**
  * @method addChild
- * @param {cc.Node} arg0
- * @param {int} arg1
- * @param {vec2_object} arg2
- * @param {vec2_object} arg3
- */
-addChild : function (
-node, 
-int, 
-vec2, 
+* @param {cc.Node|cc.Node|cc.Node} node
+* @param {int|int|int} int
+* @param {vec2_object|int|String} vec2
+* @param {vec2_object} vec2
+*/
+addChild : function(
+node,
+int,
+vec2,
 vec2 
 )
 {

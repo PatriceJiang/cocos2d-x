@@ -1447,10 +1447,10 @@ bonedata
 
 /**
  * @method init
- * @param {String} arg0
- * @return {bool}
- */
-init : function (
+* @param {String} str
+* @return {bool|bool}
+*/
+init : function(
 str 
 )
 {
@@ -2169,7 +2169,7 @@ getBatchNode : function (
  * @method init
 * @param {String|String} str
 * @param {ccs.Bone} bone
-* @return {bool|bool}
+* @return {bool|bool|bool}
 */
 init : function(
 str,
