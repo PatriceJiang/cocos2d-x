@@ -77,6 +77,7 @@
 #include "LayerTest/LayerTest.h"
 #include "LightTest/LightTest.h"
 #include "MaterialSystemTest/MaterialSystemTest.h"
+#include "MemoryTests/MemoryTest.h"
 #include "MenuTest/MenuTest.h"
 #include "MotionStreakTest/MotionStreakTest.h"
 #include "MultiTouchTest/MultiTouchTest.h"

@@ -204,6 +204,7 @@ list(APPEND GAME_HEADER
      Classes/OpenURLTest/OpenURLTest.h
      Classes/ConsoleTest/ConsoleTest.h
      Classes/MenuTest/MenuTest.h
+     Classes/MemoryTests/MemoryTest.h
      )
 
 list(APPEND GAME_SOURCE
@@ -325,6 +326,7 @@ list(APPEND GAME_SOURCE
      Classes/ZwoptexTest/ZwoptexTest.cpp
      Classes/SpriteFrameCacheTest/SpriteFrameCacheTest.cpp
      Classes/controller.cpp
+     Classes/MemoryTests/MemoryTest.cpp
      )
 
 if(ANDROID OR IOS)

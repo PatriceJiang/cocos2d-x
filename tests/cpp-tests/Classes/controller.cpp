@@ -43,6 +43,8 @@ class RootTests : public TestList
 public:
     RootTests()
     {
+        addTest("Memory usage", []() { return new MemoryUsageTests(); });
+
 //        addTest("Node: Scene3D", [](){return new (std::nothrow) Scene3DTests(); });
         addTest("ActionManager", [](){return new (std::nothrow) ActionManagerTests(); });
         addTest("Actions - Basic", [](){ return new (std::nothrow) ActionsTests(); });
@@ -106,6 +108,7 @@ public:
         addTest("Node: FastTileMap", [](){return new FastTileMapTests(); });
         addTest("Node: Text Input", [](){return new TextInputTests(); });
         addTest("Node: UI", [](){  return new UITests(); });
+        addTest("Memory usage", []() { return new MemoryUsageTests(); });
         addTest("Mouse", []() { return new MouseTests(); });
         addTest("MultiTouch", []() { return new MultiTouchTests(); });
         addTest("Renderer", []() { return new NewRendererTests(); });
