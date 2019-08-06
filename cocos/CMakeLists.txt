@@ -125,6 +125,9 @@ elseif(MACOSX OR APPLE)
  FIND_LIBRARY(FOUNDATION_LIBRARY Foundation)
  FIND_LIBRARY(ICONV_LIBRARY iconv)
 
+
+ find_library(GAMECONTROLLER GameController)
+
   set(PLATFORM_SPECIFIC_LIBS
     ${COCOA_LIBRARY}
     ${OPENGL_LIBRARY}
@@ -187,7 +190,7 @@ if(ANDROID)
 elseif(LINUX)
   target_link_libraries(cocos2d cocos2dInternal dl)
 else()
-  target_link_libraries(cocos2d cocos2dInternal)
+  target_link_libraries(cocos2d cocos2dInternal ${GAMECONTROLLER})
 endif()
 
 set_target_properties(cocos2d

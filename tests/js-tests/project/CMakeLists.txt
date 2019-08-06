@@ -34,8 +34,8 @@ endif()
 
 set(SAMPLE_SRC
   Classes/AppDelegate.cpp
-  Classes/js_DrawNode3D_bindings.cpp
-  Classes/js_Effect3D_bindings.cpp
+  #Classes/js_DrawNode3D_bindings.cpp
+  #Classes/js_Effect3D_bindings.cpp
   ${PLATFORM_SRC}
 )
 

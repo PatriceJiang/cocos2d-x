@@ -245,7 +245,8 @@ AudioEngineImpl::~AudioEngineImpl()
 {
     if (_scheduler != nullptr)
     {
-        _scheduler->unschedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update), this);
+//       auto r = CC_SCHEDULE_SELECTOR(AudioEngineImpl::update);
+//_scheduler->unschedule(r, this);
     }
 
     if (s_ALContext) {
@@ -430,7 +431,7 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
 
     if (_lazyInitLoop) {
         _lazyInitLoop = false;
-        _scheduler->schedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update), this, 0.05f, false);
+     //   _scheduler->schedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update), this, 0.05f, false, false);
     }
 
     return _currentAudioID++;
@@ -684,7 +685,7 @@ void AudioEngineImpl::update(float dt)
 
     if(_audioPlayers.empty()){
         _lazyInitLoop = true;
-        _scheduler->unschedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update), this);
+ //       _scheduler->unschedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update));
     }
 }
 

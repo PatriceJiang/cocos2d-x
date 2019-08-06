@@ -207,7 +207,7 @@ bool jsb_register_all_modules()
     
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
-    se->addRegisterCallback(register_javascript_objc_bridge);
+  //  se->addRegisterCallback(register_javascript_objc_bridge);
 #endif
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)

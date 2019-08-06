@@ -2,6 +2,7 @@
 if(MACOSX OR APPLE)
   set(COCOS_BASE_SPECIFIC_SRC
     base/CCUserDefault-apple.mm
+    base/CCController-apple.mm
   )
 
 elseif(ANDROID)
@@ -47,6 +48,7 @@ set(COCOS_BASE_SRC
   base/CCProfiling.cpp
   base/CCProperties.cpp
   base/CCRef.cpp
+  base/CCScheduler.h
   base/CCScheduler.cpp
   base/CCScriptSupport.cpp
   base/CCTouch.cpp
