@@ -3792,7 +3792,8 @@
         "tools/particle/convert_YCoordFlipped.py", 
         "tools/performance-analyze/README.md", 
         "tools/performance-analyze/convertor.py", 
-        "tools/release/generate_docs.sh"
+        "tools/release/generate_docs.sh", 
+        "v4-recompile-libfreetype.zip"
     ], 
     "lua": [
         "cocos/scripting/lua-bindings/CMakeLists.txt", 
