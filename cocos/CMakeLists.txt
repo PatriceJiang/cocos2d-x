@@ -51,6 +51,7 @@ include(audio/CMakeLists.txt)
 option(BUILD_EDITOR_COCOSTUDIO "Build editor support for cocostudio" ON)
 option(BUILD_EDITOR_SPINE "Build editor support for spine" OFF)
 option(BUILD_EXTENSIONS "Build extension library" ON)
+option(BUILD_AUDIO_OBOE "Build Android with google/oboe" ON)
 
 if(BUILD_EDITOR_COCOSTUDIO)
     include(editor-support/cocostudio/CMakeLists.txt)
@@ -116,12 +117,20 @@ use_cocos2dx_compile_options(cocos2d)
 # use all platform related system libs
 use_cocos2dx_libs_depend(cocos2d)
 
+
+# use google/oboe
+set(OBOE_DIR /home/jiang/Github/oboe)
+add_subdirectory(${OBOE_DIR} ${ENGINE_BINARY_PATH}/oboe)
+
+target_link_libraries(cocos2d oboe)
+
 target_include_directories(cocos2d
     PUBLIC ${COCOS2DX_ROOT_PATH}
     PUBLIC ${COCOS2DX_ROOT_PATH}/cocos
     PUBLIC ${COCOS2DX_ROOT_PATH}/extensions
     PUBLIC ${COCOS2DX_ROOT_PATH}/cocos/platform
     PUBLIC ${COCOS2DX_ROOT_PATH}/cocos/editor-support
+    PUBLIC ${OBOE_DIR}/include
     INTERFACE ${COCOS2DX_ROOT_PATH}/cocos/base
     INTERFACE ${COCOS2DX_ROOT_PATH}/cocos/audio/include
     INTERFACE ${COCOS2DX_ROOT_PATH}/cocos/platform/${PLATFORM_FOLDER}

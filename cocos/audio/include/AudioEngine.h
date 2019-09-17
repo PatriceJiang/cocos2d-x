@@ -77,6 +77,8 @@ public:
 
 class AudioEngineImpl;
 
+class AudioPlayer;
+
 /**
  * @class AudioEngine
  *
@@ -325,7 +327,8 @@ protected:
 
         }
     };
-    
+
+#if CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID
     struct AudioInfo
     {
         const std::string* filePath;
@@ -347,7 +350,11 @@ protected:
 
     //audioID,audioAttribute
     static std::unordered_map<int, AudioInfo> _audioIDInfoMap;
-    
+#else
+    static std::unordered_map<int, std::shared_ptr<AudioPlayer>> _audioPlayers;
+#endif
+
+
     //audio file path,audio IDs
     static std::unordered_map<std::string,std::list<int>> _audioPathIDMap;
     
@@ -358,11 +365,13 @@ protected:
     
     static ProfileHelper* _defaultProfileHelper;
     
-    static AudioEngineImpl* _audioEngineImpl;
+//    static AudioEngineImpl* _audioEngineImpl;
 
+#if CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID
     class AudioEngineThreadPool;
     static AudioEngineThreadPool* s_threadPool;
-    
+#endif
+
     static bool _isEnabled;
     
     friend class AudioEngineImpl;
