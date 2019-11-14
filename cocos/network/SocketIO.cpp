@@ -316,9 +316,9 @@ std::shared_ptr<SocketIOPacket> SocketIOPacket::createPacketWithType(const std::
     }
     else if(version == SocketIOPacket::SocketIOVersion::V10x)
     {
-        auto ret2 = std::make_shared<SocketIOPacketV10x>();
-        ret2->initWithType(type);
-        return ret2;
+        auto ret = std::make_shared<SocketIOPacketV10x>();
+        ret->initWithType(type);
+        return ret;
     }
     return nullptr;
 }
@@ -333,9 +333,9 @@ std::shared_ptr<SocketIOPacket>  SocketIOPacket::createPacketWithTypeIndex(int t
     }
     else if(version == SocketIOPacket::SocketIOVersion::V10x)
     {
-        auto ret2 = std::make_shared<SocketIOPacketV10x>();
-        ret2->initWithTypeIndex(type);
-        return ret2;
+        auto ret = std::make_shared<SocketIOPacketV10x>();
+        ret->initWithTypeIndex(type);
+        return ret;
     }
     return nullptr;
 }
@@ -349,7 +349,7 @@ class SIOClientImpl :
     public std::enable_shared_from_this<SIOClientImpl>
 {
 private:
-    int _heartbeat = 0, _timeout;
+    int _heartbeat, _timeout;
     std::string _sid;
     Uri _uri;
     std::string _caFilePath;
@@ -387,7 +387,7 @@ public:
 
     void send(const std::string& endpoint, const std::string& s);
     void send(const std::string& endpoint, const std::vector<std::string>& s);
-    void send(std::shared_ptr<SocketIOPacket> packet);
+    void send(std::shared_ptr<SocketIOPacket>& packet);
     void emit(const std::string& endpoint, const std::string& eventname, const std::string& args);
     void emit(const std::string& endpoint, const std::string& eventname, const std::vector<std::string>& args);
 
@@ -408,12 +408,9 @@ SIOClientImpl::SIOClientImpl(const Uri& uri, const std::string& caFilePath) :
 
 SIOClientImpl::~SIOClientImpl()
 {
-    CCLOG("SIOClientImpl::~SIOClientImpl: %p", this);
     if (_connected)
         disconnect();
 
-
-    CCLOG("Delete WebSocket: %p", _ws);
     CC_SAFE_DELETE(_ws);
 }
 
@@ -605,7 +602,6 @@ void SIOClientImpl::openSocket()
     {
         CC_SAFE_DELETE(_ws);
     }
-    CCLOG("New WebSocket: %p", _ws);
 
     return;
 }
@@ -623,7 +619,6 @@ void SIOClientImpl::connect()
 
 void SIOClientImpl::disconnect()
 {
-    CCLOG("SIOClientImpl::disconnect()");
     if(_ws->getReadyState() == WebSocket::State::OPEN)
     {
         std::string s, endpoint;
@@ -735,7 +730,7 @@ void SIOClientImpl::send(const std::string& endpoint, const std::string& s)
     send(endpoint, t);
 }
 
-void SIOClientImpl::send(std::shared_ptr<SocketIOPacket> packet)
+void SIOClientImpl::send(std::shared_ptr<SocketIOPacket>& packet)
 {
     std::string req = packet->toString();
     if (_connected)
@@ -797,8 +792,6 @@ void SIOClientImpl::onOpen(WebSocket* /*ws*/)
         client.second->onOpen();
     }
 
-    //this->retain();
-    CCLOGINFO("SIOClientImpl::onOpen socket connected!");
 }
 
 void SIOClientImpl::onMessage(WebSocket* /*ws*/, const WebSocket::Data& data)
@@ -1034,13 +1027,10 @@ void SIOClientImpl::onMessage(WebSocket* /*ws*/, const WebSocket::Data& data)
 
 void SIOClientImpl::onClose(WebSocket* /*ws*/)
 {
-    CCLOG("SIOClientImpl::onClose %p", this);
     if (!_clients.empty())
     {
         for (auto& client : _clients)
         {
-
-            CCLOG("SIOClientImpl::onClose %p, socketClosed!", this);
             client.second->socketClosed();
         }
         // discard this client
@@ -1069,7 +1059,6 @@ SIOClient::SIOClient(const std::string& path, std::shared_ptr<SIOClientImpl>& im
 
 SIOClient::~SIOClient()
 {
-    CCLOG("SIOClient::~SIOClient ");
     if (isConnected())
     {
         _socket->disconnectFromEndpoint(_path);
@@ -1139,21 +1128,15 @@ void SIOClient::emit(const std::string& eventname, const std::vector<std::string
 
 void SIOClient::disconnect()
 {
-
-    CCLOG("SIOClient::disconnect");
     setConnected(false);
-
     _socket->disconnectFromEndpoint(_path);
-    CCLOG("SIOClient::disconnect release this %p", this);
     this->release();
 }
 
 void SIOClient::socketClosed()
 {
-    CCLOG("SISIOClient::socketClosed %p", this);
     setConnected(false);
     _delegate->onClose(this);
-    CCLOG("SIOClient::socketClosed release this %p", this);
     this->release();
 }
 
