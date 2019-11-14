@@ -434,7 +434,14 @@ void SIOClientImpl::handshake()
     request->setUrl(pre.str());
     request->setRequestType(HttpRequest::Type::GET);
 
-    request->setResponseCallback(CC_CALLBACK_2(SIOClientImpl::handshakeResponse, this));
+    std::weak_ptr<SIOClientImpl> self = shared_from_this();
+    auto callback = [self](HttpClient* client, HttpResponse *resp) {
+        auto conn = self.lock();
+        if (conn) {
+            conn->handshakeResponse(client, resp);
+        }
+    };
+    request->setResponseCallback(callback);
     request->setTag("handshake");
 
     CCLOGINFO("SIOClientImpl::handshake() waiting");
@@ -776,7 +783,12 @@ void SIOClientImpl::onOpen(WebSocket* /*ws*/)
         _ws->send(s.data());
     }
 
-    auto f = [this](float dt) {this->heartbeat(dt);};
+    std::weak_ptr<SIOClientImpl> self = shared_from_this();
+    auto f = [self](float dt) {
+        auto conn = self.lock();
+        if(conn)
+            conn->heartbeat(dt);
+    };
 
     Director::getInstance()->getScheduler()->schedule(f, this, (_heartbeat * .9f), false, "heart_beat");
 

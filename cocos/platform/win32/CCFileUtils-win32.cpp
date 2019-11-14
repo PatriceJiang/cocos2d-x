@@ -168,7 +168,7 @@ bool FileUtilsWin32::isAbsolutePath(const std::string& strPath) const
 }
 
 
-FileUtils::Status FileUtilsWin32::getContents(const std::string& filename, ResizableBuffer* buffer) const
+FileUtils::Status FileUtilsWin32::getContents(const std::string& filename, std::vector<char>* buffer) const
 {
     if (filename.empty())
         return FileUtils::Status::NotExists;
@@ -196,7 +196,7 @@ FileUtils::Status FileUtilsWin32::getContents(const std::string& filename, Resiz
 
     buffer->resize(size);
     DWORD sizeRead = 0;
-    BOOL successed = ::ReadFile(fileHandle, buffer->buffer(), size, &sizeRead, nullptr);
+    BOOL successed = ::ReadFile(fileHandle, buffer->data(), size, &sizeRead, nullptr);
     ::CloseHandle(fileHandle);
 
     if (!successed) {

@@ -158,7 +158,7 @@ target_compile_options(cocos2d PUBLIC
 )
 set_property(TARGET cocos2d APPEND PROPERTY LINK_FLAGS -fsanitize=address -lasan
 )
-target_link_libraries(cocos2d asan)
+#target_link_libraries(cocos2d asan)
 
 
 #if(XCODE)

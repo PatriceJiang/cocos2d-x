@@ -207,7 +207,7 @@ function(setup_cocos_app_config app_name)
         cocos_config_app_xcode_property(${app_name})
     endif()
 
-    target_link_libraries(${app_name} asan)
+    #target_link_libraries(${app_name} asan)
 
 endfunction()
 
