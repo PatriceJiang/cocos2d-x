@@ -767,10 +767,10 @@ void SIOClientImpl::emit(const std::string& endpoint, const std::string& eventna
 void SIOClientImpl::onOpen(WebSocket* /*ws*/)
 {
     _connected = true;
-    {
-        auto p  = shared_from_this();
-        SocketIO::getInstance()->addSocket(_uri.getAuthority(), p);
-    }
+
+    auto self = shared_from_this();
+
+    SocketIO::getInstance()->addSocket(_uri.getAuthority(), self);
 
     if (_version == SocketIOPacket::SocketIOVersion::V10x)
     {
@@ -778,9 +778,9 @@ void SIOClientImpl::onOpen(WebSocket* /*ws*/)
         _ws->send(s.data());
     }
 
-    std::weak_ptr<SIOClientImpl> self = shared_from_this();
-    auto f = [self](float dt) {
-        auto conn = self.lock();
+    std::weak_ptr<SIOClientImpl> selfWeak = shared_from_this();
+    auto f = [selfWeak](float dt) {
+        auto conn = selfWeak.lock();
         if(conn)
             conn->heartbeat(dt);
     };
