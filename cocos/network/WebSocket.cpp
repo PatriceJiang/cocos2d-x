@@ -467,11 +467,12 @@ public:
             return false;
         }
 
-        _data.reserve(LWS_PRE + len);
-        _data.resize(LWS_PRE, 0x00);
+        _data.resize(LWS_PRE + len);
+        std::fill(_data.begin(), _data.begin() + LWS_PRE, 0);
+
         if (len > 0)
         {
-            _data.insert(_data.end(), buf, buf + len);
+            std::copy(buf, buf + len, _data.begin() + LWS_PRE);
         }
 
         _payload = _data.data() + LWS_PRE;
