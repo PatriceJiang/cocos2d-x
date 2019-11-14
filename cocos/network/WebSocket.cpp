@@ -468,8 +468,7 @@ public:
         }
 
         _data.resize(LWS_PRE + len);
-        std::fill(_data.begin(), _data.begin() + LWS_PRE, 0);
-
+        
         if (len > 0)
         {
             std::copy(buf, buf + len, _data.begin() + LWS_PRE);

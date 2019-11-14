@@ -677,7 +677,7 @@ void SIOClientImpl::disconnectFromEndpoint(const std::string& endpoint)
 
     if (_clients.empty() || endpoint == "/")
     {
-        CCLOG("SIOClientImpl::disconnectFromEndpoint out of endpoints, checking for disconnect");
+        CCLOGINFO("SIOClientImpl::disconnectFromEndpoint out of endpoints, checking for disconnect");
 
         if (_connected)
             this->disconnect();
