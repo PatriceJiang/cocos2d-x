@@ -206,6 +206,9 @@ function(setup_cocos_app_config app_name)
     if (XCODE)
         cocos_config_app_xcode_property(${app_name})
     endif()
+
+    target_link_libraries(${app_name} asan)
+
 endfunction()
 
 # if cc_variable not set, then set it cc_value

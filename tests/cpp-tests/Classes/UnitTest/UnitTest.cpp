@@ -1740,15 +1740,15 @@ void ResizableBufferAdapterTest::onEnter()
     UnitTestDemo::onEnter();
 
     Data data;
-    ResizableBufferAdapter<Data> buffer(&data);
+    //ResizableBufferAdapter<Data> buffer(&data);
 
-    FileUtils::getInstance()->getContents("effect1.wav", &buffer);
+    FileUtils::getInstance()->getContents("effect1.wav", &data);
     EXPECT_EQ(data.getSize(), 10026);
 
-    FileUtils::getInstance()->getContents("effect2.ogg", &buffer);
+    FileUtils::getInstance()->getContents("effect2.ogg", &data);
     EXPECT_EQ(data.getSize(), 4278);
 
-    FileUtils::getInstance()->getContents("effect1.wav", &buffer);
+    FileUtils::getInstance()->getContents("effect1.wav", &data);
     EXPECT_EQ(data.getSize(), 10026);
 }
 

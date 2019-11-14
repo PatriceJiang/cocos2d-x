@@ -54,6 +54,17 @@ THE SOFTWARE.
     #define CCASSERT(cond, msg)
 #endif
 
+#if defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+#define CC_NO_ASAN __attribute__((no_sanitize("address")))
+#  endif
+#endif
+
+#ifndef CC_NO_ASAN
+#define CC_NO_ASAN
+#endif
+
+
 #define GP_ASSERT(cond) CCASSERT(cond, "")
 
 // FIXME:: Backward compatible

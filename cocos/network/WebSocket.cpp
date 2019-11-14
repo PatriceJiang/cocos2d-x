@@ -139,6 +139,8 @@ static void wsLog(const char * format, ...)
     #define LOGE(fmt, ...) wsLog("E/" LOG_TAG " (" QUOTEME(__LINE__) "): " fmt "", ##__VA_ARGS__)
 #endif
 
+#define LOGD(fmt, ...)
+
 static void printWebSocketLog(int level, const char *line)
 {
 #if COCOS2D_DEBUG > 0
@@ -544,6 +546,7 @@ WebSocket::WebSocket()
 WebSocket::~WebSocket()
 {
     LOGD("In the destructor of WebSocket (%p)\n", this);
+    CCLOG("::~WebSocket %p", this);
 
     std::lock_guard<std::mutex> lk(__instanceMutex);
 

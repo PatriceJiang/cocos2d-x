@@ -598,13 +598,13 @@ void TestGetContents::onEnter()
     FileUtilsDemo::onEnter();
     auto fs = FileUtils::getInstance();
 
-    auto testIfCompiles = [fs]() {
-        fs->getContents("", (CustomBuffer*)(nullptr));
-        AlreadyExistsBuffer buf;
-        fs->getContents("", &buf);
-    };
+    // auto testIfCompiles = [fs]() {
+    //     fs->getContents("", (CustomBuffer*)(nullptr));
+    //     AlreadyExistsBuffer buf;
+    //     fs->getContents("", &buf);
+    // };
 
-    (void)(testIfCompiles);
+    // (void)(testIfCompiles);
 
     auto winSize = Director::getInstance()->getWinSize();
 
@@ -638,7 +638,7 @@ void TestGetContents::onEnter()
             if (serr != FileUtils::Status::OK)
                 return std::string("failed: error: " + FileErrors[(int)serr]);
 
-            std::vector<int> vbuf;
+            std::vector<char> vbuf;
             auto verr = fs->getContents(file, &vbuf);
             if (verr != FileUtils::Status::OK)
                 return std::string("failed: error: " + FileErrors[(int)verr]);

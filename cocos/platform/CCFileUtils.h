@@ -66,7 +66,8 @@ class ResizableBufferAdapter< std::basic_string<CharT, Traits, Allocator> > : pu
 public:
     explicit ResizableBufferAdapter(BufferType* buffer) : _buffer(buffer) {}
     virtual void resize(size_t size) override {
-        _buffer->resize((size + sizeof(CharT) - 1) / sizeof(CharT));
+        //_buffer->resize((size + sizeof(CharT) - 1) / sizeof(CharT));
+        _buffer->resize(size);
     }
     virtual void* buffer() const override {
         // can not invoke string::front() if it is empty
@@ -256,17 +257,21 @@ public:
      *      - Status::TooLarge when there file to be read is too large (> 2^32-1), the buffer will not changed.
      *      - Status::ObtainSizeFailed when failed to obtain the file size, the buffer will not changed.
      */
-    template <
-        typename T,
-        typename Enable = typename std::enable_if<
-            std::is_base_of< ResizableBuffer, ResizableBufferAdapter<T> >::value
-        >::type
-    >
-    Status getContents(const std::string& filename, T* buffer) const {
-        ResizableBufferAdapter<T> buf(buffer);
-        return getContents(filename, &buf);
-    }
-    virtual Status getContents(const std::string& filename, ResizableBuffer* buffer) const;
+    // template <
+    //     typename T,
+    //     typename Enable = typename std::enable_if<
+    //         std::is_base_of< ResizableBuffer, ResizableBufferAdapter<T> >::value
+    //     >::type
+    // >
+    // Status getContents(const std::string& filename, T* buffer) const {
+    //     ResizableBufferAdapter<T> buf(buffer);
+    //     return getContents(filename, &buf);
+    // }
+    virtual Status getContents(const std::string& filename, std::vector<char>* buffer) const;
+
+    virtual Status getContents(const std::string& filename, cocos2d::Data* buffer) const;
+
+    virtual Status getContents(const std::string& filename, std::string* buffer) const;
 
     /**
      *  Gets resource file data from a zip file.

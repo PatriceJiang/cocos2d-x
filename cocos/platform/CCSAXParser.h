@@ -26,6 +26,7 @@
 #define __CCSAXPARSER_H__
 /// @cond DO_NOT_SHOW
 
+#include "base/ccMacros.h"
 #include "platform/CCPlatformConfig.h"
 #include "platform/CCCommon.h"
 #include <string>
@@ -89,12 +90,12 @@ public:
      * @js NA
      * @lua NA
      */
-    bool parse(const std::string& filename);
+    CC_NO_ASAN bool parse(const std::string& filename);
 
     /**
     * New API for performance.
     */
-    bool parseIntrusive(char* xmlData, size_t dataLength);
+    CC_NO_ASAN bool parseIntrusive(char* xmlData, size_t dataLength);
 
     /**
      * @js NA

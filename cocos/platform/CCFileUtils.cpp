@@ -629,9 +629,9 @@ void FileUtils::purgeCachedEntries()
 
 std::string FileUtils::getStringFromFile(const std::string& filename) const
 {
-    std::string s;
+    std::vector<char> s;
     getContents(filename, &s);
-    return s;
+    return std::string(s.data(), s.size());
 }
 
 void FileUtils::getStringFromFile(const std::string &path, std::function<void (std::string)> callback) const
@@ -647,7 +647,9 @@ void FileUtils::getStringFromFile(const std::string &path, std::function<void (s
 Data FileUtils::getDataFromFile(const std::string& filename) const
 {
     Data d;
-    getContents(filename, &d);
+    std::vector<char> s;
+    getContents(filename, &s);
+    d.copy((unsigned char*)s.data(), s.size());
     return d;
 }
 
@@ -659,7 +661,29 @@ void FileUtils::getDataFromFile(const std::string& filename, std::function<void(
     }, std::move(callback));
 }
 
-FileUtils::Status FileUtils::getContents(const std::string& filename, ResizableBuffer* buffer) const
+FileUtils::Status FileUtils::getContents(const std::string& filename, cocos2d::Data* buffer) const
+{
+    std::vector<char> s;
+    auto state = getContents(filename, &s);
+    if(state == Status::OK)
+    {
+        buffer->copy((unsigned char*)s.data(), s.size());
+    }
+    return state;
+}
+
+FileUtils::Status FileUtils::getContents(const std::string& filename, std::string* buffer) const
+{
+    std::vector<char> s;
+    auto state = getContents(filename, &s);
+    if(state == Status::OK)
+    {
+        *buffer = std::string(s.data(), s.size());
+    }
+    return state;
+}
+
+FileUtils::Status FileUtils::getContents(const std::string& filename, std::vector<char>* buffer) const
 {
     if (filename.empty())
         return Status::NotExists;
@@ -677,7 +701,7 @@ FileUtils::Status FileUtils::getContents(const std::string& filename, ResizableB
         return Status::ReadFailed;
     }
 
-    if (!(statBuf.st_mode & S_IFREG)) { 
+    if (!(statBuf.st_mode & S_IFREG)) {
         return Status::NotRegularFileType;
     }
 
@@ -688,7 +712,7 @@ FileUtils::Status FileUtils::getContents(const std::string& filename, ResizableB
     size_t size = statBuf.st_size;
 
     buffer->resize(size);
-    size_t readsize = fread(buffer->buffer(), 1, size, fp);
+    size_t readsize = fread(buffer->data(), 1, size, fp);
     fclose(fp);
 
     if (readsize < size) {
