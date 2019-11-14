@@ -349,7 +349,7 @@ class SIOClientImpl :
     public std::enable_shared_from_this<SIOClientImpl>
 {
 private:
-    int _heartbeat, _timeout;
+    int _heartbeat = 0, _timeout;
     std::string _sid;
     Uri _uri;
     std::string _caFilePath;
