@@ -232,8 +232,6 @@ AttributeLocation ShaderModuleMTL::getAttributeLocation(std::string name)
 
 void ShaderModuleMTL::setBuiltinAttributeLocation()
 {
-    std::fill(_attributeLocation, _attributeLocation + ATTRIBUTE_MAX, AttributeLocation());
-    ///a_position
     auto iter = _attributeInfo.find(ATTRIBUTE_NAME_POSITION);
     if(iter != _attributeInfo.end())
     {

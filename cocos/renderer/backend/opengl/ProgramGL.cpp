@@ -135,9 +135,6 @@ void ProgramGL::compileProgram()
 
 void ProgramGL::computeLocations()
 {
-    std::fill(_builtinAttributeLocation, _builtinAttributeLocation + ATTRIBUTE_MAX, AttributeLocation(-1));
-//    std::fill(_builtinUniformLocation, _builtinUniformLocation + UNIFORM_MAX, -1);
-
     ///a_position
     auto location = glGetAttribLocation(_program, ATTRIBUTE_NAME_POSITION);
     _builtinAttributeLocation[Attribute::POSITION] = AttributeLocation(location);
