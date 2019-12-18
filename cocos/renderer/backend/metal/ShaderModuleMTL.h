@@ -104,14 +104,14 @@ public:
      * @param name Specifies the engine built-in attribute enum name.
      * @return The attribute location.
      */
-    int getAttributeLocation(Attribute name) const;
+    AttributeLocation getAttributeLocation(Attribute name) const;
 
     /**
      * Get attribute location by attribute name.
      * @param name Specifies the attribute name.
      * @return The attribute location.
      */
-    int getAttributeLocation(std::string name);
+    AttributeLocation getAttributeLocation(std::string name);
 
     /**
      * Get uniform buffer size in bytes that holds all the uniforms.
@@ -134,7 +134,7 @@ private:
     
     int _maxLocation = -1;
     int _uniformLocation[UNIFORM_MAX];
-    int _attributeLocation[ATTRIBUTE_MAX];
+    AttributeLocation _attributeLocation[ATTRIBUTE_MAX];
     std::size_t _uniformBufferSize = 0;
 };
 

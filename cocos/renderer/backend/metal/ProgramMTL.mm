@@ -47,14 +47,14 @@ ProgramMTL::~ProgramMTL()
     CC_SAFE_RELEASE(_fragmentShader);
 }
 
-int ProgramMTL::getAttributeLocation(Attribute name) const
+AttributeLocation ProgramMTL::getAttributeLocation(Attribute name) const
 {
-    return _vertexShader->getAttributeLocation(name);
+    return AttributeLocation(_vertexShader->getAttributeLocation(name));
 }
 
-int ProgramMTL::getAttributeLocation(const std::string &name) const
+AttributeLocation ProgramMTL::getAttributeLocation(const std::string &name) const
 {
-    return _vertexShader->getAttributeLocation(name);
+    return AttributeLocation(_vertexShader->getAttributeLocation(name));
 }
 
 UniformLocation ProgramMTL::getUniformLocation(backend::Uniform name) const

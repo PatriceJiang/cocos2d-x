@@ -109,7 +109,7 @@ void ShaderModuleMTL::parseAttibute(id<MTLDevice> mtlDevice, glslopt_shader* sha
         
         AttributeBindInfo attributeInfo;
         attributeInfo.attributeName = parName;
-        attributeInfo.location = location;
+        attributeInfo.location = AttributeLocation(location);
         _attributeInfo[parName] = attributeInfo;
     }
 }
@@ -216,42 +216,42 @@ void ShaderModuleMTL::setBuiltinUniformLocation()
     }
 }
 
-int ShaderModuleMTL::getAttributeLocation(Attribute name) const
+AttributeLocation ShaderModuleMTL::getAttributeLocation(Attribute name) const
 {
     return _attributeLocation[name];
 }
 
-int ShaderModuleMTL::getAttributeLocation(std::string name)
+AttributeLocation ShaderModuleMTL::getAttributeLocation(std::string name)
 {
     auto iter = _attributeInfo.find(name);
     if(iter != _attributeInfo.end())
         return _attributeInfo[name].location;
     else
-        return -1;
+        return AttributeLocation();
 }
 
 void ShaderModuleMTL::setBuiltinAttributeLocation()
 {
-    std::fill(_attributeLocation, _attributeLocation + ATTRIBUTE_MAX, -1);
+    std::fill(_attributeLocation, _attributeLocation + ATTRIBUTE_MAX, AttributeLocation());
     ///a_position
     auto iter = _attributeInfo.find(ATTRIBUTE_NAME_POSITION);
     if(iter != _attributeInfo.end())
     {
-        _attributeLocation[Attribute::POSITION] = iter->second.location;
+        _attributeLocation[Attribute::POSITION] = AttributeLocation(iter->second.location);
     }
     
     ///a_color
     iter = _attributeInfo.find(ATTRIBUTE_NAME_COLOR);
     if(iter != _attributeInfo.end())
     {
-        _attributeLocation[Attribute::COLOR] = iter->second.location;
+        _attributeLocation[Attribute::COLOR] = AttributeLocation(iter->second.location);
     }
     
     ///a_texCoord
     iter = _attributeInfo.find(ATTRIBUTE_NAME_TEXCOORD);
     if(iter != _attributeInfo.end())
     {
-        _attributeLocation[Attribute::TEXCOORD] = iter->second.location;
+        _attributeLocation[Attribute::TEXCOORD] = AttributeLocation(iter->second.location);
     }
 }
 

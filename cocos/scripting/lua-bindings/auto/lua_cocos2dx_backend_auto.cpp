@@ -732,8 +732,8 @@ int lua_cocos2dx_backend_Program_getAttributeLocation(lua_State* tolua_S)
             ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "ccb.Program:getAttributeLocation");
 
             if (!ok) { break; }
-            int ret = cobj->getAttributeLocation(arg0);
-            tolua_pushnumber(tolua_S,(lua_Number)ret);
+            cocos2d::backend::AttributeLocation ret = cobj->getAttributeLocation(arg0);
+            attribute_location_to_luaval(tolua_S, ret);
             return 1;
         }
     }while(0);
@@ -744,8 +744,8 @@ int lua_cocos2dx_backend_Program_getAttributeLocation(lua_State* tolua_S)
             ok &= luaval_to_std_string(tolua_S, 2,&arg0, "ccb.Program:getAttributeLocation");
 
             if (!ok) { break; }
-            int ret = cobj->getAttributeLocation(arg0);
-            tolua_pushnumber(tolua_S,(lua_Number)ret);
+            cocos2d::backend::AttributeLocation ret = cobj->getAttributeLocation(arg0);
+            attribute_location_to_luaval(tolua_S, ret);
             return 1;
         }
     }while(0);
@@ -1415,8 +1415,8 @@ int lua_cocos2dx_backend_ProgramState_getAttributeLocation(lua_State* tolua_S)
             ok &= luaval_to_int32(tolua_S, 2,(int *)&arg0, "ccb.ProgramState:getAttributeLocation");
 
             if (!ok) { break; }
-            int ret = cobj->getAttributeLocation(arg0);
-            tolua_pushnumber(tolua_S,(lua_Number)ret);
+            cocos2d::backend::AttributeLocation ret = cobj->getAttributeLocation(arg0);
+            attribute_location_to_luaval(tolua_S, ret);
             return 1;
         }
     }while(0);
@@ -1427,8 +1427,8 @@ int lua_cocos2dx_backend_ProgramState_getAttributeLocation(lua_State* tolua_S)
             ok &= luaval_to_std_string(tolua_S, 2,&arg0, "ccb.ProgramState:getAttributeLocation");
 
             if (!ok) { break; }
-            int ret = cobj->getAttributeLocation(arg0);
-            tolua_pushnumber(tolua_S,(lua_Number)ret);
+            cocos2d::backend::AttributeLocation ret = cobj->getAttributeLocation(arg0);
+            attribute_location_to_luaval(tolua_S, ret);
             return 1;
         }
     }while(0);

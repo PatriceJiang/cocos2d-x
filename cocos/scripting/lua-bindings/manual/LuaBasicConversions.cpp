@@ -3379,6 +3379,12 @@ bool luaval_to_attribute_location(lua_State* L, int pos, cocos2d::backend::Attri
     return true;
 }
 
+void attribute_location_to_luaval(lua_State* L, const cocos2d::backend::AttributeLocation& desc)
+{
+    lua_pushinteger((int)desc.value);
+}
+
+
 void uniformLocation_to_luaval(lua_State* L, const cocos2d::backend::UniformLocation& loc)
 {
     if (L == nullptr)

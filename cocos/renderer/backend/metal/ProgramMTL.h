@@ -69,14 +69,14 @@ public:
      * @param name Specifies the attribute name.
      * @return The attribute location.
      */
-    virtual int getAttributeLocation(const std::string& name) const override;
+    virtual AttributeLocation getAttributeLocation(const std::string& name) const override;
 
     /**
      * Get attribute location by engine built-in attribute enum name.
      * @param name Specifies the engine built-in attribute enum name.
      * @return The attribute location.
      */
-    virtual int getAttributeLocation(Attribute name) const override;
+    virtual AttributeLocation getAttributeLocation(Attribute name) const override;
     
     /**
      * Get vertex shader module.
