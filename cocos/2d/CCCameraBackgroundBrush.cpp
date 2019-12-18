@@ -417,6 +417,7 @@ bool CameraBackgroundSkyBoxBrush::init()
     _uniformColorLoc        = _programState->getUniformLocation("u_color");
     _uniformCameraRotLoc    = _programState->getUniformLocation("u_cameraRot");
     _uniformEnvLoc          = _programState->getUniformLocation("u_Env");
+    
 
 
     auto &pipelineDescriptor                            = _customCommand.getPipelineDescriptor();
@@ -425,7 +426,8 @@ bool CameraBackgroundSkyBoxBrush::init()
     // disable blend
     pipelineDescriptor.blendDescriptor.blendEnabled     = false;
 
-    layout->setAttribute(shaderinfos::attribute::ATTRIBUTE_NAME_POSITION, 0, backend::VertexFormat::FLOAT3, 0, false);
+    auto locAttrName = _programState->getAttributeLocation(shaderinfos::attribute::ATTRIBUTE_NAME_POSITION);
+    layout->setAttribute(shaderinfos::attribute::ATTRIBUTE_NAME_POSITION, locAttrName, backend::VertexFormat::FLOAT3, 0, false);
     layout->setLayout(sizeof(Vec3));
 
     initBuffer();

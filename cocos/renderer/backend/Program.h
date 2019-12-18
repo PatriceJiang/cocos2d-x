@@ -75,14 +75,14 @@ public:
      * @param name Specifies the attribute name.
      * @return The attribute location.
      */
-    virtual int getAttributeLocation(const std::string& name) const =  0;
+    virtual AttributeLocation getAttributeLocation(const std::string& name) const =  0;
 
     /**
      * Get attribute location by engine built-in attribute enum name.
      * @param name Specifies the engine built-in attribute enum name.
      * @return The attribute location.
      */
-    virtual int getAttributeLocation(backend::Attribute name) const =  0;
+    virtual AttributeLocation getAttributeLocation(backend::Attribute name) const =  0;
     
     /**
      * Get maximum vertex location.

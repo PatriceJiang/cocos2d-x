@@ -1305,7 +1305,7 @@ CC_LUA_DLL void uniformLocation_to_luaval(lua_State* L, const cocos2d::backend::
 
 CC_LUA_DLL void program_activeattrs_to_luaval(lua_State *L , const std::unordered_map<std::string, cocos2d::backend::AttributeBindInfo> &map);
 
-
+CC_LUA_DLL bool luaval_to_attribute_location(lua_State* L, int pos, cocos2d::backend::AttributeLocation& loc, const char* message);
 // end group
 /// @}
 #endif //__COCOS2DX_SCRIPTING_LUA_COCOS2DXSUPPORT_LUABAISCCONVERSIONS_H__

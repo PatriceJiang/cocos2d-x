@@ -125,7 +125,7 @@ public:
      * @return Attribute location.
      * @see `int getAttributeLocation(const std::string& name) const`
      */
-    inline int getAttributeLocation(const std::string& name) const { return _program->getAttributeLocation(name); }
+    inline AttributeLocation getAttributeLocation(const std::string& name) const { return _program->getAttributeLocation(name); }
 
     /**
      * Get an attribute location by the engine built-in attribute name.
@@ -133,7 +133,7 @@ public:
      * @return Attribute location.
      * @see `int getAttributeLocation(const std::string& name) const`
      */
-    inline int getAttributeLocation(Attribute name) const { return _program->getAttributeLocation(name); }
+    inline AttributeLocation getAttributeLocation(Attribute name) const { return _program->getAttributeLocation(name); }
 
     /**
      * A callback to update unifrom.

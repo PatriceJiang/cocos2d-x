@@ -73,7 +73,7 @@ public:
      * @param offset Specifies the byte offset to the first component of the first generic vertex attribute.
      * @param needToBeNormallized Specifies whether fixed-point data values should be normalized (true) or converted directly as fixed-point values (false) when they are accessed.
      */
-    void setAttribute(const std::string& name, std::size_t index, VertexFormat format, std::size_t offset, bool needToBeNormallized);
+    void setAttribute(const std::string& name, AttributeLocation index, VertexFormat format, std::size_t offset, bool needToBeNormallized);
     
     /**
      * Set stride of vertices.

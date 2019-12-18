@@ -1045,14 +1045,14 @@ int lua_cocos2dx_backend_VertexLayout_setAttribute(lua_State* tolua_S)
     if (argc == 5) 
     {
         std::string arg0;
-        unsigned int arg1;
+        cocos2d::backend::AttributeLocation arg1;
         cocos2d::backend::VertexFormat arg2;
         unsigned int arg3;
         bool arg4;
 
         ok &= luaval_to_std_string(tolua_S, 2,&arg0, "ccb.VertexLayout:setAttribute");
 
-        ok &= luaval_to_uint32(tolua_S, 3,&arg1, "ccb.VertexLayout:setAttribute");
+        ok &= luaval_to_attribute_location(tolua_S, 3, arg1, "ccb.VertexLayout:setAttribute");
 
         ok &= luaval_to_int32(tolua_S, 4,(int *)&arg2, "ccb.VertexLayout:setAttribute");
 

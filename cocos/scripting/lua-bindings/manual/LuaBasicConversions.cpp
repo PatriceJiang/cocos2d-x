@@ -3369,6 +3369,16 @@ bool luaval_to_uniformLocation(lua_State* L, int pos, cocos2d::backend::UniformL
     return true;
 }
 
+bool luaval_to_attribute_location(lua_State* L, int pos, cocos2d::backend::AttributeLocation& loc, const char* message)
+{
+    if (L == nullptr)
+        return false;
+
+    auto idx = lua_tointeger(L, pos);
+    loc = cocos2d::backend::AttributeLocation(idx);
+    return true;
+}
+
 void uniformLocation_to_luaval(lua_State* L, const cocos2d::backend::UniformLocation& loc)
 {
     if (L == nullptr)
@@ -3408,7 +3418,7 @@ void program_activeattrs_to_luaval(lua_State *L , const std::unordered_map<std::
         lua_rawset(L, -3);
 
         lua_pushstring(L, "location");
-        lua_pushinteger(L, p.second.location);
+        lua_pushinteger(L, p.second.location.value);
         lua_rawset(L, -3);
 
         lua_pushstring(L, "size");

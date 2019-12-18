@@ -307,13 +307,19 @@ struct UniformLocation
     std::size_t operator()(const UniformLocation &uniform) const;
 };
 
+struct AttributeLocation {
+    explicit AttributeLocation(int loc) :value(loc) {}
+    AttributeLocation() = default;
+    size_t value = -1;
+    operator bool() { return value >= 0; }
+};
 
 struct AttributeBindInfo
 {
     std::string attributeName;
-    int         location    = -1;
-    int         size        = 0;
-    int         type        = 0;
+    AttributeLocation   location;
+    int                 size        = 0;
+    int                 type        = 0;
 };
 
 enum class TextureCubeFace : uint32_t

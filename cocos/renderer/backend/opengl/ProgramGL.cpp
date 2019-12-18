@@ -135,20 +135,20 @@ void ProgramGL::compileProgram()
 
 void ProgramGL::computeLocations()
 {
-    std::fill(_builtinAttributeLocation, _builtinAttributeLocation + ATTRIBUTE_MAX, -1);
+    std::fill(_builtinAttributeLocation, _builtinAttributeLocation + ATTRIBUTE_MAX, AttributeLocation(-1));
 //    std::fill(_builtinUniformLocation, _builtinUniformLocation + UNIFORM_MAX, -1);
 
     ///a_position
     auto location = glGetAttribLocation(_program, ATTRIBUTE_NAME_POSITION);
-    _builtinAttributeLocation[Attribute::POSITION] = location;
+    _builtinAttributeLocation[Attribute::POSITION] = AttributeLocation(location);
 
     ///a_color
     location = glGetAttribLocation(_program, ATTRIBUTE_NAME_COLOR);
-    _builtinAttributeLocation[Attribute::COLOR] = location;
+    _builtinAttributeLocation[Attribute::COLOR] = AttributeLocation(location);
 
     ///a_texCoord
     location = glGetAttribLocation(_program, ATTRIBUTE_NAME_TEXCOORD);
-    _builtinAttributeLocation[Attribute::TEXCOORD] = location;
+    _builtinAttributeLocation[Attribute::TEXCOORD] = AttributeLocation(location);
 
     ///u_MVPMatrix
     location = glGetUniformLocation(_program, UNIFORM_NAME_MVP_MATRIX);
@@ -220,7 +220,7 @@ const std::unordered_map<std::string, AttributeBindInfo> ProgramGL::getActiveAtt
         glGetActiveAttrib(_program, i, MAX_ATTRIBUTE_NAME_LENGTH, &attrNameLen, &attrSize, &attrType, attrName.data());
         CHECK_GL_ERROR_DEBUG();
         info.attributeName = std::string(attrName.data(), attrName.data() + attrNameLen);
-        info.location = glGetAttribLocation(_program, info.attributeName.c_str());
+        info.location = AttributeLocation(glGetAttribLocation(_program, info.attributeName.c_str()));
         info.type = attrType;
         info.size = UtilsGL::getGLDataTypeSize(attrType) * attrSize;
         CHECK_GL_ERROR_DEBUG();
@@ -272,14 +272,14 @@ void ProgramGL::computeUniformInfos()
     free(uniformName);
 }
 
-int ProgramGL::getAttributeLocation(Attribute name) const
+AttributeLocation ProgramGL::getAttributeLocation(Attribute name) const
 {
     return _builtinAttributeLocation[name];
 }
 
-int ProgramGL::getAttributeLocation(const std::string& name) const
+AttributeLocation ProgramGL::getAttributeLocation(const std::string& name) const
 {
-    return glGetAttribLocation(_program, name.c_str());
+    return AttributeLocation(glGetAttribLocation(_program, name.c_str()));
 }
 
 UniformLocation ProgramGL::getUniformLocation(backend::Uniform name) const

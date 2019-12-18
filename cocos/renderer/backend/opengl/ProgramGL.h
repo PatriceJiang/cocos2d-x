@@ -45,7 +45,7 @@ class ShaderModuleGL;
  */
 struct AttributeInfo
 {
-    unsigned int location = 0;
+    AttributeLocation location;
     unsigned int size = 0;
     GLenum type = GL_BYTE;
     GLsizei stride = 0;
@@ -109,14 +109,14 @@ public:
      * @param name Specifies the attribute name.
      * @return The attribute location.
      */
-    virtual int getAttributeLocation(const std::string& name) const override;
+    virtual AttributeLocation getAttributeLocation(const std::string& name) const override;
 
     /**
      * Get attribute location by engine built-in attribute enum name.
      * @param name Specifies the engine built-in attribute enum name.
      * @return The attribute location.
      */
-    virtual int getAttributeLocation(Attribute name) const override;
+    virtual AttributeLocation getAttributeLocation(Attribute name) const override;
 
     /**
      * Get maximum vertex location.
@@ -185,7 +185,7 @@ private:
     std::size_t _totalBufferSize = 0;
     int _maxLocation = -1;
     UniformLocation _builtinUniformLocation[UNIFORM_MAX];
-    int _builtinAttributeLocation[Attribute::ATTRIBUTE_MAX];
+    AttributeLocation _builtinAttributeLocation[Attribute::ATTRIBUTE_MAX];
     std::unordered_map<int, int> _bufferOffset;
 };
 //end of _opengl group
